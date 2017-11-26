@@ -148,7 +148,6 @@ void loop() {
 
   if (stringComplete)
   {
-
     if(inputString == "?\r")
     {
       PrintHelp();
@@ -384,6 +383,13 @@ void serialEvent() {
     char inChar = (char)Serial.read();
     // add it to the inputString:
     inputString += inChar;
+   
+    if(inputString == "@")
+    {
+      Serial.print("@O-12345-1-1-0-0-1-0$");
+      return;
+    }
+ 
     Serial.print(inChar);
     // if the incoming character is a newline, set a flag so the main loop can
     // do something about it:
