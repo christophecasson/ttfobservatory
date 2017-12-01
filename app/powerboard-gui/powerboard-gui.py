@@ -3,6 +3,8 @@ from appJar import gui
 from threading import Thread
 import time
 import serial
+import termios
+import sys
 
 
 
@@ -16,79 +18,114 @@ btn_out6_state = False
 board_state = False
 board_vin = 0
 
+last_btn_out1_state = False
+last_btn_out2_state = False
+last_btn_out3_state = False
+last_btn_out4_state = False
+last_btn_out5_state = False
+last_btn_out6_state = False
 
-serialport = '/dev/cu.wchusbserial141220'
+last_board_state = False
+last_board_vin = 0
+
+closeapp = False
+
+
+serialport = str(sys.argv[1])
 serialportbaudrate = 9600
+ser = serial.Serial( port=serialport, baudrate=serialportbaudrate )
 
-#ser = serial.Serial( port=serialport, baudrate=serialportbaudrate )
-#ser.isOpen()
+def connect():
+	global ser
+	ser.isOpen()
+	print("serial port " + serialport + " connected at " + str(serialportbaudrate) + " bauds")
+
+def disconnect():
+	print("serial port disconnected")
 
 
 
+def StateUpdater():
 
-class StateUpdater(Thread):
+	global last_btn_out1_state
+	global last_btn_out2_state
+	global last_btn_out3_state
+	global last_btn_out4_state
+	global last_btn_out5_state
+	global last_btn_out6_state
+	global last_board_state
+	global last_board_vin
 
-	def __init__(self):
-		Thread.__init__(self)
+	if last_board_vin != board_vin:
+		app.setLabel("l_Vin", str(board_vin)+" mV")
+	
+	if board_state == False:
+		if board_state != last_board_state:
+			last_board_state = board_state
+			app.setLabel("l_BoardStatus", "BOARD ERROR")
+			app.setBg("#500000")
+			setButtonUnknown("btn_out1")
+			setButtonUnknown("btn_out2")
+			setButtonUnknown("btn_out3")
+			setButtonUnknown("btn_out4")
+			setButtonUnknown("btn_out5")
+			setButtonUnknown("btn_out6")
 
-	def run(self):
-
-		while 1:
-
-			global board_state
-
-			print "stateUpdater() 1"
-
-			if board_state == False:
-				app.setLabel("l_BoardStatus", "BOARD ERROR")
-				app.setLabel("l_Vin", "----- mV")
-				setButtonUnknown("btn_out1")
-				setButtonUnknown("btn_out2")
-				setButtonUnknown("btn_out3")
-				setButtonUnknown("btn_out4")
-				setButtonUnknown("btn_out5")
-				setButtonUnknown("btn_out6")
+	else:
+		if board_state != last_board_state:
+			last_board_state = board_state
+			app.setLabel("l_BoardStatus", "BOARD OK")
+			app.setBg("#202020")
+			last_btn_out1_state = not btn_out1_state
+			last_btn_out2_state = not btn_out2_state
+			last_btn_out3_state = not btn_out3_state
+			last_btn_out4_state = not btn_out4_state
+			last_btn_out5_state = not btn_out5_state
+			last_btn_out6_state = not btn_out6_state
 			
+
+		if btn_out1_state != last_btn_out1_state:
+			last_btn_out1_state = btn_out1_state
+			if btn_out1_state == False:
+				setButtonOFF("btn_out1")
 			else:
-				app.setLabel("l_BoardStatus", "BOARD OK")
+				setButtonON("btn_out1")
 
-				app.setLabel("l_Vin", str(board_vin)+" mV")
+		if btn_out2_state != last_btn_out2_state:
+			last_btn_out2_state = btn_out2_state
+			if btn_out2_state == False:
+				setButtonOFF("btn_out2")
+			else:
+				setButtonON("btn_out2")
 
-				if btn_out1_state == False:
-					setButtonOFF("btn_out1")
-				else:
-					setButtonON("btn_out1")
+		if btn_out3_state != last_btn_out3_state:
+			last_btn_out3_state = btn_out3_state
+			if btn_out3_state == False:
+				setButtonOFF("btn_out3")
+			else:
+				setButtonON("btn_out3")
 
-				if btn_out2_state == False:
-					setButtonOFF("btn_out2")
-				else:
-					setButtonON("btn_out2")
+		if btn_out4_state != last_btn_out4_state:
+			last_btn_out4_state = btn_out4_state
+			if btn_out4_state == False:
+				setButtonOFF("btn_out4")
+			else:
+				setButtonON("btn_out4")
 
-				if btn_out3_state == False:
-					setButtonOFF("btn_out3")
-				else:
-					setButtonON("btn_out3")
+		if btn_out5_state != last_btn_out5_state:
+			last_btn_out5_state = btn_out5_state
+			if btn_out5_state == False:
+				setButtonOFF("btn_out5")
+			else:
+				setButtonON("btn_out5")
 
-				if btn_out4_state == False:
-					setButtonOFF("btn_out4")
-				else:
-					setButtonON("btn_out4")
+		if btn_out6_state != last_btn_out6_state:
+			last_btn_out6_state = btn_out6_state
+			if btn_out6_state == False:
+				setButtonOFF("btn_out6")
+			else:
+				setButtonON("btn_out6")
 
-				if btn_out5_state == False:
-					setButtonOFF("btn_out5")
-				else:
-					setButtonON("btn_out5")
-
-				if btn_out6_state == False:
-					setButtonOFF("btn_out6")
-				else:
-					setButtonON("btn_out6")
-
-			print "stateUpdater() 2"
-
-			time.sleep(0.025)
-
-			print "stateUpdater() 3"
 
 
 
@@ -114,14 +151,7 @@ def setButtonUnknown(button):
 
 def sendCmd(cmd):
 	ser.write(cmd+"\r")
-	#app.setLabel("l_sent", cmd)
-	#time.sleep(1)
-	#recvCmd()
-
-#def recv():
-#	recvstr = ser.read(ser.inWaiting())
-#	app.setLabel("l_recv", recvstr)
-#	return recvstr
+	
 
 def updateStatus():
 
@@ -135,76 +165,91 @@ def updateStatus():
 	global btn_out5_state
 	global btn_out6_state
 
+	datastring = ""
+	data = ''
 
-	#sendCmd("@")
-			# resp: @-O-12345-1-1-0-0-1-0-$
-			#data = recv()
-	#while ser.inWaiting() > 0:
-		#data = ser.read(1)
-		#datastring += data
-		#if data == "$":
+	while closeapp == False:
+
+		
+
+		ser.write("@")
+		time.sleep(0.25)
+
+		while ser.inWaiting() > 0:
+			data = ser.read(1)
+			datastring += data
+
+			if data == "@":
+				datastring = "@"
 
 
+			if data == "$":
+				#datastring = "@-O-12036-1-1-1-0-1-0-$"
+				item = datastring.split('-')
 
-	datastring = "@-O-12036-1-1-1-0-1-0-$"
-	item = datastring.split('-')
+				board_state = True
+				
+				if item[0] != '@':
+					board_state = False
 
-	global board_state
-	board_state = True
-	
-	if item[0] != '@':
-		board_state = False
+				if item[9] != '$':
+					board_state = False
 
-	if item[9] != '$':
-		board_state = False
+				if item[1] != 'O':
+					board_state = False
 
-	if item[1] != 'O':
-		board_state = False
+				board_vin = item[2]
+				
+				if item[3] == '0':
+					btn_out1_state = False
+				elif item[3] == '1':
+					btn_out1_state = True
+				else:
+					board_state = False
 
-	board_vin = item[2]
-	
-	if item[3] == '0':
-		btn_out1_state = False
-	elif item[3] == '1':
-		btn_out1_state = True
-	else:
-		board_state = False
+				if item[4] == '0':
+					btn_out2_state = False
+				elif item[4] == '1':
+					btn_out2_state = True
+				else:
+					board_state = False
 
-	if item[4] == '0':
-		btn_out2_state = False
-	elif item[4] == '1':
-		btn_out2_state = True
-	else:
-		board_state = False
+				if item[5] == '0':
+					btn_out3_state = False
+				elif item[5] == '1':
+					btn_out3_state = True
+				else:
+					board_state = False
 
-	if item[5] == '0':
-		btn_out3_state = False
-	elif item[5] == '1':
-		btn_out3_state = True
-	else:
-		board_state = False
+				if item[6] == '0':
+					btn_out4_state = False
+				elif item[6] == '1':
+					btn_out4_state = True
+				else:
+					board_state = False
 
-	if item[6] == '0':
-		btn_out4_state = False
-	elif item[6] == '1':
-		btn_out4_state = True
-	else:
-		board_state = False
+				if item[7] == '0':
+					btn_out5_state = False
+				elif item[7] == '1':
+					btn_out5_state = True
+				else:
+					board_state = False
 
-	if item[7] == '0':
-		btn_out5_state = False
-	elif item[7] == '1':
-		btn_out5_state = True
-	else:
-		board_state = False
+				if item[8] == '0':
+					btn_out6_state = False
+				elif item[8] == '1':
+					btn_out6_state = True
+				else:
+					board_state = False
 
-	if item[8] == '0':
-		btn_out6_state = False
-	elif item[8] == '1':
-		btn_out6_state = True
-	else:
-		board_state = False
-			
+				#datastring = ""
+
+				StateUpdater()
+				#time.sleep(0.1)
+				#break
+
+
+					
 
 
 # handle button events
@@ -246,13 +291,13 @@ def press(button):
 		else:
 			sendCmd("6 OFF")
 
-	updateStatus()
+	#updateStatus()
 
 
 
 
 # create a GUI variable called app
-app = gui("Power Board", "600x600")
+app = gui("Power Board", "600x600", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
 app.setFont(20)
@@ -260,8 +305,8 @@ app.setFont(20)
 
 
 
-app.addButton("Update", press, 0, 1)
-app.setButton("Update", "Update status")
+#app.addButton("Update", press, 0, 1)
+#app.setButton("Update", "Update status")
 
 
 app.addLabel("l_out1", "1: Roof", 1, 0)
@@ -307,16 +352,22 @@ app.addLabel("l_Vin")
 #app.getLabelWidget("VinStr").config(font="Courier 15")
 
 
-#start threads
-updater = StateUpdater()
-updater.start()
+connect()
+ser.write("@") #start automatic status sending on arduino
+
+
+app.thread(updateStatus)
+
 
 # start the GUI
 app.go()
 
 
+closeapp = True
+ser.write("#") #stop automatic status sending on arduino
+disconnect()
 
-
+#app.stop()
 
 
 
