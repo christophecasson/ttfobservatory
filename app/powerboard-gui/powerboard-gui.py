@@ -33,14 +33,21 @@ closeapp = False
 
 serialport = str(sys.argv[1])
 serialportbaudrate = 9600
-ser = serial.Serial( port=serialport, baudrate=serialportbaudrate )
+
+
 
 def connect():
 	global ser
+	ser = serial.Serial( port=serialport, baudrate=serialportbaudrate, timeout=5 )
 	ser.isOpen()
 	print("serial port " + serialport + " connected at " + str(serialportbaudrate) + " bauds")
+	ser.write("@") #start automatic status sending on arduino
 
 def disconnect():
+	global ser
+	if ser.isOpen():
+		ser.write("#") #stop automatic status sending on arduino
+	ser.close()
 	print("serial port disconnected")
 
 
@@ -150,10 +157,21 @@ def setButtonUnknown(button):
 
 
 def sendCmd(cmd):
-	ser.write(cmd+"\r")
+	try:
+		ser.write(cmd+"\r")
+	except:
+		print "-----3-----"
+		app.stop()
+
+
+
+
+	
 	
 
 def updateStatus():
+
+	global app
 
 	global board_state
 	global board_vin
@@ -171,12 +189,24 @@ def updateStatus():
 	while closeapp == False:
 
 		
+		try:
+			ser.write("@")
+		except:
+			print "-----1-----"
+			app.stop()
 
-		ser.write("@")
+
 		time.sleep(0.25)
 
 		while ser.inWaiting() > 0:
-			data = ser.read(1)
+			try:
+				data = ser.read(1)
+			except:
+				print "-----2-----"
+				app.stop()
+
+
+
 			datastring += data
 
 			if data == "@":
@@ -352,9 +382,10 @@ app.addLabel("l_Vin")
 #app.getLabelWidget("VinStr").config(font="Courier 15")
 
 
-connect()
-ser.write("@") #start automatic status sending on arduino
 
+
+
+connect()
 
 app.thread(updateStatus)
 
@@ -364,7 +395,6 @@ app.go()
 
 
 closeapp = True
-ser.write("#") #stop automatic status sending on arduino
 disconnect()
 
 #app.stop()

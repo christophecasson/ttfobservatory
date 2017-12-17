@@ -27,8 +27,13 @@
 //blinking status led
 #define pin_statusled 13
 int ledState = LOW;
-unsigned long previousMillis = 0;
-long statusblink_interval = 1000;           // interval at which to blink (milliseconds)
+unsigned long ledblink_previousMillis = 0;
+long ledblink_interval = 1000;           // interval at which to blink (milliseconds)
+
+
+//automatic status sending
+unsigned long status_previousMillis = 0;
+long status_interval = 250;           // interval at which to blink (milliseconds)
 
 
 int inputvoltage = 0;
@@ -38,8 +43,10 @@ bool state_out[6];
 
 
 String inputString = "";         // a String to hold incoming data
-boolean stringComplete = false;  // whether the string is complete
+bool stringComplete = false;  // whether the string is complete
+bool guiconnected = false;    // handle automatic status sending for GUI 
 
+bool board_status = false;
 
 void setup() {
   pinMode(pin_statusled, OUTPUT);
@@ -95,7 +102,7 @@ void setup() {
 }
 
 void loop() {
-  statusled();
+  ledblink();
   
   inputvoltage = analogRead(pin_inputvoltage) * INV_COEF;
   if(inputvoltage < 10000)
@@ -106,7 +113,8 @@ void loop() {
     state_out[3] = false;
     state_out[4] = false;
     state_out[5] = false;
-    statusblink_interval = 250;
+    ledblink_interval = 250;
+    board_status = false;
   }
   else if(inputvoltage > 13500)
   {
@@ -116,11 +124,13 @@ void loop() {
     state_out[3] = false;
     state_out[4] = false;
     state_out[5] = false;
-    statusblink_interval = 100;
+    ledblink_interval = 100;
+    board_status = false;
   }
   else
   {
-    statusblink_interval = 1000;
+    ledblink_interval = 1000;
+    board_status = true;
   }
 
   state_out[0] ? digitalWrite(pin_out_1, LOW) : digitalWrite(pin_out_1, HIGH);
@@ -129,6 +139,12 @@ void loop() {
   state_out[3] ? digitalWrite(pin_out_4, LOW) : digitalWrite(pin_out_4, HIGH);
   state_out[4] ? digitalWrite(pin_out_5, LOW) : digitalWrite(pin_out_5, HIGH);
   state_out[5] ? digitalWrite(pin_out_6, LOW) : digitalWrite(pin_out_6, HIGH);
+
+
+  if (guiconnected)
+  {
+    statussend();
+  }
 
 
   for(int i=0; i<4; i++)
@@ -143,6 +159,7 @@ void loop() {
       default:                                                          break;
     }
   }
+
 
 
 
@@ -377,8 +394,10 @@ void PrintHelp()
   routine is run between each time loop() runs, so using delay inside loop can
   delay response. Multiple bytes of data may be available.
 */
-void serialEvent() {
-  while (Serial.available()) {
+void serialEvent()
+{
+  while (Serial.available())
+  {
     // get the new byte:
     char inChar = (char)Serial.read();
     // add it to the inputString:
@@ -386,30 +405,73 @@ void serialEvent() {
    
     if(inputString == "@")
     {
-      Serial.print("@O-12345-1-1-0-0-1-0$");
-      return;
+      guiconnected = true;
+      inputString = "";
     }
- 
-    Serial.print(inChar);
-    // if the incoming character is a newline, set a flag so the main loop can
-    // do something about it:
-    if (inChar == '\r') {
-      stringComplete = true;
-      Serial.println("");
+    else if(inputString == "#")
+    {
+      guiconnected = false;
+      inputString = "";
     }
+    else
+    {
+      Serial.print(inChar);
+      // if the incoming character is a newline, set a flag so the main loop can
+      // do something about it:
+      if (inChar == '\r')
+      {
+        stringComplete = true;
+        Serial.println("");
+      }
+    }
+
   }
 }
 
 
-void statusled()
+
+
+
+
+void ledblink()
 {
   unsigned long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= statusblink_interval)
+  if (currentMillis - ledblink_previousMillis >= ledblink_interval)
   {
-    previousMillis = currentMillis;
+    ledblink_previousMillis = currentMillis;
     ledState = !ledState;
     digitalWrite(pin_statusled, ledState);
+  }
+}
+
+void statussend()
+{
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - status_previousMillis >= status_interval)
+  {
+    status_previousMillis = currentMillis;
+
+    Serial.print("@");
+    Serial.print("-");
+    board_status ? Serial.print("O") : Serial.print("E"); //Serial.print("E");
+    Serial.print("-");
+    Serial.print(inputvoltage);
+    Serial.print("-");
+    state_out[0] ? Serial.print("1") : Serial.print("0");
+    Serial.print("-");
+    state_out[1] ? Serial.print("1") : Serial.print("0");
+    Serial.print("-");
+    state_out[2] ? Serial.print("1") : Serial.print("0");
+    Serial.print("-");
+    state_out[3] ? Serial.print("1") : Serial.print("0");
+    Serial.print("-");
+    state_out[4] ? Serial.print("1") : Serial.print("0");
+    Serial.print("-");
+    state_out[5] ? Serial.print("1") : Serial.print("0");
+    Serial.print("-");
+    Serial.print("$");
   }
 }
 
