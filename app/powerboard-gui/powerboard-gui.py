@@ -132,19 +132,19 @@ def StateUpdater():
 
 
 def setButtonON(button):
-	app.setButton(button, "ON ")
+	app.setButton(button, " ON  ")
 	app.setButtonBg(button, "red")
 	app.setButtonFg(button, "#202020")
 	
 
 def setButtonOFF(button):
-	app.setButton(button, "OFF")
+	app.setButton(button, " OFF ")
 	app.setButtonBg(button, "#202020")
 	app.setButtonFg(button, "#AAAAAA")
 
 
 def setButtonUnknown(button):
-	app.setButton(button, " - ")
+	app.setButton(button, "  -  ")
 	app.setButtonBg(button, "#808080")
 	app.setButtonFg(button, "#DDDDDD")
 
@@ -297,10 +297,10 @@ def press(button):
 
 
 # create a GUI variable called app
-app = gui("Power Board", "600x600", handleArgs=False)
+app = gui("Power Board", "200x600", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
-app.setFont(20)
+app.setFont(24)
 
 
 
