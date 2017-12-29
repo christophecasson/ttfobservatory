@@ -11,6 +11,8 @@ import sys
 roof_state = "UNKNOWN"
 board_state = False
 board_vin = 0
+openlock = 0
+closelock = 0
 
 last_roof_state = "UNKNOWN"
 last_board_state = False
@@ -80,7 +82,15 @@ def StateUpdater():
 				app.setImage("state_img", "ressources/Idle.png")
 
 		
+		if openlock == False:
+			app.setLabel("open_lock", "Fully opened lock = 0")
+		else:
+			app.setLabel("open_lock", "Fully opened lock = 1")
 
+		if closelock == False:
+			app.setLabel("close_lock", "Fully closed lock = 0")
+		else:
+			app.setLabel("close_lock", "Fully closed lock = 1")
 
 
 
@@ -108,6 +118,9 @@ def updateStatus():
 	global board_vin
 
 	global roof_state
+
+	global openlock
+	global closelock
 
 	datastring = ""
 	data = ''
@@ -146,7 +159,7 @@ def updateStatus():
 				if item[0] != '@':
 					board_state = False
 
-				if item[4] != '$':
+				if item[6] != '$':
 					board_state = False
 
 				if item[1] != 'O':
@@ -155,6 +168,21 @@ def updateStatus():
 				board_vin = item[2]
 				
 				roof_state = item[3]
+
+				if item[4] == '0':
+					openlock = False
+				elif item[4] == '1':
+					openlock = True
+				else:
+					board_state = False
+
+				if item[5] == '0':
+					closelock = False
+				elif item[5] == '1':
+					closelock = True
+				else:
+					board_state = False
+
 
 				
 
@@ -194,6 +222,8 @@ app.addImage("state_img", "ressources/Idle.png", 0, 0)
 
 
 app.addLabel("roof_state", " --- ", 0, 1)
+app.addLabel("open_lock", " --- ", 0, 2)
+app.addLabel("close_lock", " --- ", 0, 3)
 app.addButton("Open", press, 1, 0)
 app.addButton("Close", press, 1, 1)
 app.addButton("Abort", press, 1, 2)

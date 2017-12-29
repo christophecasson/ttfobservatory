@@ -7,13 +7,13 @@
 
 
 #define pin_inputvoltage  A0
-#define INV_COEF          19.6
+#define INV_COEF          51.7
 
-#define pin_button_open  8
-#define pin_button_close  9
-#define pin_button_abort  10
-#define pin_sensor_closed  11
-#define pin_sensor_opened 12
+#define pin_button_open  10
+#define pin_button_close  11
+#define pin_button_abort  12
+#define pin_sensor_closed  9
+#define pin_sensor_opened 8
 
 #define pin_relay_enable     2
 #define pin_relay_direction     3
@@ -88,10 +88,10 @@ void setup() {
   key_Close->enableRepeatResult(false);
 
   key_Abort->begin();
-  key_Abort->enableDoublePress(true);
-  key_Abort->enableLongPress(true);
-  key_Abort->enableRepeat(true);
-  key_Abort->enableRepeatResult(true);
+  key_Abort->enableDoublePress(false);
+  key_Abort->enableLongPress(false);
+  key_Abort->enableRepeat(false);
+  key_Abort->enableRepeatResult(false);
   
 
   Serial.begin(9600);
@@ -107,8 +107,8 @@ void setup() {
 void loop() {
   ledblink();
   
-  //inputvoltage = analogRead(pin_inputvoltage) * INV_COEF;
-  inputvoltage = 12000;
+  inputvoltage = analogRead(pin_inputvoltage) * INV_COEF;
+  //inputvoltage = 12000;
   if(inputvoltage < 10000)
   {
     state = STATE_IDLE;
@@ -314,6 +314,7 @@ void StateMachine()
       SetOutputRelay_CLOSE();
       if(isClosed())
       {
+        delay(2000);
         state = STATE_CLOSED;
       }
       break;
@@ -324,6 +325,7 @@ void StateMachine()
       SetOutputRelay_OPEN();
       if(isOpened())
       {
+        delay(2000);
         state = STATE_OPENED;
       }
       break;
@@ -370,21 +372,28 @@ void Abort()
 void SetOutputRelay_OFF()
 {
   digitalWrite(pin_relay_enable, LOW);
+  delay(50);
   digitalWrite(pin_relay_direction, LOW);
 }
 
 void SetOutputRelay_OPEN()
 {
-  digitalWrite(pin_relay_direction, HIGH);
-  delay(10);
-  digitalWrite(pin_relay_enable, HIGH);
+  if(board_status == true)
+  {
+    digitalWrite(pin_relay_direction, HIGH);
+    delay(50);
+    digitalWrite(pin_relay_enable, HIGH);
+  }
 }
 
 void SetOutputRelay_CLOSE()
 {
-  digitalWrite(pin_relay_direction, LOW);
-  delay(10);
-  digitalWrite(pin_relay_enable, HIGH);
+  if(board_status == true)
+  {
+    digitalWrite(pin_relay_direction, LOW);
+    delay(50);
+    digitalWrite(pin_relay_enable, HIGH);
+  }
 }
 
 
@@ -470,11 +479,15 @@ void statussend()
 
     Serial.print("@");
     Serial.print("-");
-    board_status ? Serial.print("O") : Serial.print("E"); //Serial.print("E");
+    board_status ? Serial.print("O") : Serial.print("E");
     Serial.print("-");
     Serial.print(inputvoltage);
     Serial.print("-");
     printState();
+    Serial.print("-");
+    isOpened() ? Serial.print("1") : Serial.print("0");
+    Serial.print("-");
+    isClosed() ? Serial.print("1") : Serial.print("0");
     Serial.print("-");
     Serial.print("$");
   }
