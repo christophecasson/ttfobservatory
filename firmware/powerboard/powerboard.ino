@@ -152,7 +152,7 @@ void loop() {
     switch(key[i]->read())
     {
       case MD_KeySwitch::KS_NULL:                                       break;
-      case MD_KeySwitch::KS_PRESS:                                      break;
+      case MD_KeySwitch::KS_PRESS:      Serial.print("K"); Serial.print(i);                               break;
       case MD_KeySwitch::KS_DPRESS:                                     break;
       case MD_KeySwitch::KS_LONGPRESS:  state_out[i] = !state_out[i];   break;
       case MD_KeySwitch::KS_RPTPRESS:                                   break;

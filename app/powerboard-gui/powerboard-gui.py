@@ -327,7 +327,7 @@ def press(button):
 
 
 # create a GUI variable called app
-app = gui("Power Board", "200x600", handleArgs=False)
+app = gui("Power Board", "220x600", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
 app.setFont(24)
@@ -371,9 +371,9 @@ setButtonUnknown("btn_out6")
 
 
 
-app.addLabel("l_serial")
-app.setLabel("l_serial", serialport+":"+str(serialportbaudrate))
-app.getLabelWidget("l_serial").config(font="Courier 12")
+#app.addLabel("l_serial")
+#app.setLabel("l_serial", serialport+":"+str(serialportbaudrate))
+#app.getLabelWidget("l_serial").config(font="Courier 12")
 
 
 app.addLabel("l_BoardStatus")

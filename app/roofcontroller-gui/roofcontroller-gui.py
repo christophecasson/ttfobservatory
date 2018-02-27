@@ -212,7 +212,7 @@ def press(button):
 
 
 # create a GUI variable called app
-app = gui("Roof controller", "600x600", handleArgs=False)
+app = gui("Roof controller", "800x300", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
 app.setFont(20)
@@ -229,9 +229,9 @@ app.addButton("Close", press, 1, 1)
 app.addButton("Abort", press, 1, 2)
 
 
-app.addLabel("l_serial")
-app.setLabel("l_serial", serialport+":"+str(serialportbaudrate))
-app.getLabelWidget("l_serial").config(font="Courier 12")
+#app.addLabel("l_serial")
+#app.setLabel("l_serial", serialport+":"+str(serialportbaudrate))
+#app.getLabelWidget("l_serial").config(font="Courier 12")
 
 
 app.addLabel("l_BoardStatus")
@@ -247,6 +247,7 @@ app.thread(updateStatus)
 app.go()
 
 
+sendCmd("ABORT")
 closeapp = True
 disconnect()
 
