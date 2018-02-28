@@ -41,44 +41,77 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 
 def connect():
 	global ser
-	ser = serial.Serial( port=serialport, baudrate=serialportbaudrate, timeout=5 )
-	ser.isOpen()
-	debug("serial port " + serialport + " connected at " + str(serialportbaudrate) + " bauds")
-	ser.write("@") #start automatic status sending on arduino
+	
+	debug("Connecting " + serialport + " ")
+	
+	while True:
+		try:
+			sys.stdout.write(".")
+   			sys.stdout.flush()
+
+			ser = serial.Serial( port=serialport, baudrate=serialportbaudrate, timeout=5 )
+			ser.isOpen()
+			
+			print ""
+			debug("serial port " + serialport + " connected at " + str(serialportbaudrate) + " bauds")
+			serialWrite("@") #start automatic status sending on arduino
+			return
+
+		except serial.SerialException:
+			time.sleep(1)	
+		
+
 
 def disconnect():
-	global ser
-	if ser.isOpen():
-		ser.write("#") #stop automatic status sending on arduino
-	ser.close()
-	debug("serial port disconnected")
+	try:
+		global ser
+		if ser.isOpen():
+			serialWrite("#") #stop automatic status sending on arduino
+		ser.close()
+		debug("serial port disconnected")
+	except:
+		return
+
+def reconnect():
+	debug("reconnecting serial port...")
+	try: 
+		ser.close()
+	except:
+		pass
+
+	connect()
+
+
+def serialRead(len):
+	try:
+		data = ser.read(len)
+		return data
+	except serial.SerialException:
+		debug("Error reading " + str(len) + " byte")
+		reconnect()
+
+def serialWrite(data):
+	try:
+		ser.write(data)
+		return
+	except serial.SerialException:
+		debug("Error sending " + str(data) )
+		reconnect()
 
 
 def updateStatus():
 	datastring = ""
 	data = ''
 	
-	try:
-		ser.write("@")
-	except:
-		debug("Error sending @")
-		return
-
-
+	serialWrite("@")
 	time.sleep(0.25)
 
 	while ser.inWaiting() > 0:
-		try:
-			data = ser.read(1)
-		except:
-			debug("Error reading 1 byte")
-			return
-
+		data = serialRead(1)
 		datastring += data
 
 		if data == "@":
 			datastring = "@"
-
 
 		if data == "$":
 			#datastring = "@-O-12036-1-1-1-0-1-0-$"
@@ -119,10 +152,7 @@ def updateStatus():
 
 
 def sendCmd(cmd):
-	try:
-		ser.write(cmd+"\r")
-	except:
-		debug("Error sending cmd")
+	serialWrite(cmd+"\r")
 		
 
 def ReadFifo_control_pwr(i):
@@ -162,8 +192,8 @@ def WriteFifo_status_pwr(i, data):
 
 
 
-
 connect()
+
 
 while True:
 	for i in range(1,7):
