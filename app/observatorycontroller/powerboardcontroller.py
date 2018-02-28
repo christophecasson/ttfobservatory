@@ -1,21 +1,10 @@
 #!/usr/bin/python
 
-
-#TODO: 
-# handle program close
-# roofcontroller
-# ui
-# automatic creation of fifos
-
-
-
-
-
-
 import os
 import errno
 import time
 import sys
+import signal
 import serial
 
 fifo_status_pwr_path = "/home/astro/DEV/ttfobservatory/app/observatorycontroller/fifo/status/pwr/"
@@ -24,15 +13,26 @@ fifo_control_pwr_path = "/home/astro/DEV/ttfobservatory/app/observatorycontrolle
 serialport = str(sys.argv[1])
 serialportbaudrate = 9600
 
-out1_state = False
-out2_state = False
-out3_state = False
-out4_state = False
-out5_state = False
-out6_state = False
-
 board_state = False
-board_vin = 0
+
+
+#handle Ctrl-C (SIGINT) and Kill (SIGTERM) properly
+def sigint_handler(signum, frame):
+	print "SIGINT received!\r\n Closing connections..."
+	disconnect()
+	print "exit(0)"
+	sys.exit(0)
+
+def sigterm_handler(signum, frame):
+	print "SIGTERM received!\r\n Closing connections..."
+	disconnect()
+	print "exit(0)"
+	sys.exit(0)
+ 
+signal.signal(signal.SIGINT, sigint_handler)
+signal.signal(signal.SIGTERM, sigterm_handler)
+
+
 
 
 def connect():
