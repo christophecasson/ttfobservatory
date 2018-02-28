@@ -80,6 +80,16 @@ def disconnect():
 
 def reconnect():
 	debug("reconnecting serial port...")
+	
+	WriteFifo_status("board_state", "ERR\r\n")
+	WriteFifo_status("board_vin", "ERR\r\n")
+	WriteFifo_status(1, "ERR\r\n")
+	WriteFifo_status(2, "ERR\r\n")
+	WriteFifo_status(3, "ERR\r\n")
+	WriteFifo_status(4, "ERR\r\n")
+	WriteFifo_status(5, "ERR\r\n")
+	WriteFifo_status(6, "ERR\r\n")
+	
 	try: 
 		ser.close()
 	except:
