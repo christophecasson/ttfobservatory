@@ -8,8 +8,12 @@ import sys
 import signal
 import serial
 
-fifo_status_pwr_path = "/home/astro/DEV/ttfobservatory/app/observatorycontroller/fifo/status/pwr/"
-fifo_control_pwr_path = "/home/astro/DEV/ttfobservatory/app/observatorycontroller/fifo/control/pwr/"
+
+
+
+
+
+
 
 serialport = str(sys.argv[1])
 serialportbaudrate = 9600
@@ -23,12 +27,14 @@ def debug(text):
 #handle Ctrl-C (SIGINT) and Kill (SIGTERM) properly
 def sigint_handler(signum, frame):
 	debug("SIGINT received!   Closing connections...")
+	deleteFifos()
 	disconnect()
 	debug("exit(0)")
 	sys.exit(0)
 
 def sigterm_handler(signum, frame):
 	debug("SIGTERM received!   Closing connections...")
+	deleteFifos()
 	disconnect()
 	debug("exit(0)")
 	sys.exit(0)
@@ -129,23 +135,23 @@ def updateStatus():
 				board_state = False
 
 			if board_state == True:
-				WriteFifo_status_pwr("board_state", "OK\r\n")
-				WriteFifo_status_pwr("board_vin", item[2] + "\r\n")
-				WriteFifo_status_pwr(1, item[3] + "\r\n")
-				WriteFifo_status_pwr(2, item[4] + "\r\n")
-				WriteFifo_status_pwr(3, item[5] + "\r\n")
-				WriteFifo_status_pwr(4, item[6] + "\r\n")
-				WriteFifo_status_pwr(5, item[7] + "\r\n")
-				WriteFifo_status_pwr(6, item[8] + "\r\n")
+				WriteFifo_status("board_state", "OK\r\n")
+				WriteFifo_status("board_vin", item[2] + "\r\n")
+				WriteFifo_status(1, item[3] + "\r\n")
+				WriteFifo_status(2, item[4] + "\r\n")
+				WriteFifo_status(3, item[5] + "\r\n")
+				WriteFifo_status(4, item[6] + "\r\n")
+				WriteFifo_status(5, item[7] + "\r\n")
+				WriteFifo_status(6, item[8] + "\r\n")
 			else:
-				WriteFifo_status_pwr("board_state", "ERR\r\n")
-				WriteFifo_status_pwr("board_vin", "ERR\r\n")
-				WriteFifo_status_pwr(1, "ERR\r\n")
-				WriteFifo_status_pwr(2, "ERR\r\n")
-				WriteFifo_status_pwr(3, "ERR\r\n")
-				WriteFifo_status_pwr(4, "ERR\r\n")
-				WriteFifo_status_pwr(5, "ERR\r\n")
-				WriteFifo_status_pwr(6, "ERR\r\n")
+				WriteFifo_status("board_state", "ERR\r\n")
+				WriteFifo_status("board_vin", "ERR\r\n")
+				WriteFifo_status(1, "ERR\r\n")
+				WriteFifo_status(2, "ERR\r\n")
+				WriteFifo_status(3, "ERR\r\n")
+				WriteFifo_status(4, "ERR\r\n")
+				WriteFifo_status(5, "ERR\r\n")
+				WriteFifo_status(6, "ERR\r\n")
 				
 	return
 
@@ -153,10 +159,95 @@ def updateStatus():
 
 def sendCmd(cmd):
 	serialWrite(cmd+"\r")
+
 		
 
-def ReadFifo_control_pwr(i):
-	fifo_path = fifo_control_pwr_path + str(i)
+def mkdir(path):
+	try:
+		os.stat(path)
+		debug("directory exists ( " + path + " )")
+	except:
+		os.makedirs(path)
+		debug("directory created ( " + path + " )")
+
+def mkfifo(path):
+	try:
+		os.stat(path)
+		debug("fifo exists ( " + path + " )")
+	except:
+		os.mkfifo(path)
+		debug("fifo created ( " + path + " )")
+	
+def rmfile(path):
+	try:
+		os.stat(path)
+		os.remove(path)
+		debug("file deleted ( " + path + " )")
+	except:
+		debug("error deleting file ( " + path + " )")
+
+def rmdir(path):
+	try:
+		os.stat(path)
+		os.rmdir(path)
+		debug("directory deleted ( " + path + " )")
+	except:
+		debug("error deleting directory ( " + path + " )")
+	
+
+
+fifo_root_path 	= "/home/astro/fifo/"
+fifo_board_path = fifo_root_path + "powerboard/"
+fifo_status_path = fifo_board_path + "status/"
+fifo_control_path = fifo_board_path + "control/"
+
+
+def createFifos():
+	mkdir(fifo_status_path)
+	mkdir(fifo_control_path)
+
+	mkfifo(fifo_status_path + "board_state")
+	mkfifo(fifo_status_path + "board_vin")
+	mkfifo(fifo_status_path + "1")
+	mkfifo(fifo_status_path + "2")
+	mkfifo(fifo_status_path + "3")
+	mkfifo(fifo_status_path + "4")
+	mkfifo(fifo_status_path + "5")
+	mkfifo(fifo_status_path + "6")
+
+	mkfifo(fifo_control_path + "1")
+	mkfifo(fifo_control_path + "2")
+	mkfifo(fifo_control_path + "3")
+	mkfifo(fifo_control_path + "4")
+	mkfifo(fifo_control_path + "5")
+	mkfifo(fifo_control_path + "6")
+
+def deleteFifos():
+	rmfile(fifo_status_path + "board_state")
+	rmfile(fifo_status_path + "board_vin")
+	rmfile(fifo_status_path + "1")
+	rmfile(fifo_status_path + "2")
+	rmfile(fifo_status_path + "3")
+	rmfile(fifo_status_path + "4")
+	rmfile(fifo_status_path + "5")
+	rmfile(fifo_status_path + "6")
+
+	rmfile(fifo_control_path + "1")
+	rmfile(fifo_control_path + "2")
+	rmfile(fifo_control_path + "3")
+	rmfile(fifo_control_path + "4")
+	rmfile(fifo_control_path + "5")
+	rmfile(fifo_control_path + "6")
+
+	rmdir(fifo_status_path)
+	rmdir(fifo_control_path)
+	rmdir(fifo_board_path)
+
+
+
+
+def ReadFifo_control(i):
+	fifo_path = fifo_control_path + str(i)
 	try:
 		pipe = os.open(fifo_path , os.O_RDONLY | os.O_NONBLOCK)
 		data = os.read(pipe, 1)
@@ -179,8 +270,8 @@ def ReadFifo_control_pwr(i):
 	return
 
 
-def WriteFifo_status_pwr(i, data):
-	fifo_path = fifo_status_pwr_path + str(i)
+def WriteFifo_status(i, data):
+	fifo_path = fifo_status_path + str(i)
 	try:
 		pipe = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
 		os.write(pipe, data)
@@ -193,15 +284,13 @@ def WriteFifo_status_pwr(i, data):
 
 
 connect()
-
+createFifos()
 
 while True:
 	for i in range(1,7):
-		ReadFifo_control_pwr(i)
+		ReadFifo_control(i)
 		
 	updateStatus()
 
-
-
 disconnect()
-
+deleteFifos()
