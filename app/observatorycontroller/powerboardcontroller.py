@@ -3,6 +3,7 @@
 import os
 import errno
 import time
+from datetime import datetime
 import sys
 import signal
 import serial
@@ -15,18 +16,21 @@ serialportbaudrate = 9600
 
 board_state = False
 
+#handle debug log
+def debug(text):
+	print "[ powerboardcontroller.py - " + str(datetime.now()) + " ] \t" + text 
 
 #handle Ctrl-C (SIGINT) and Kill (SIGTERM) properly
 def sigint_handler(signum, frame):
-	print "SIGINT received!\r\n Closing connections..."
+	debug("SIGINT received!   Closing connections...")
 	disconnect()
-	print "exit(0)"
+	debug("exit(0)")
 	sys.exit(0)
 
 def sigterm_handler(signum, frame):
-	print "SIGTERM received!\r\n Closing connections..."
+	debug("SIGTERM received!   Closing connections...")
 	disconnect()
-	print "exit(0)"
+	debug("exit(0)")
 	sys.exit(0)
  
 signal.signal(signal.SIGINT, sigint_handler)
@@ -39,7 +43,7 @@ def connect():
 	global ser
 	ser = serial.Serial( port=serialport, baudrate=serialportbaudrate, timeout=5 )
 	ser.isOpen()
-	print("serial port " + serialport + " connected at " + str(serialportbaudrate) + " bauds")
+	debug("serial port " + serialport + " connected at " + str(serialportbaudrate) + " bauds")
 	ser.write("@") #start automatic status sending on arduino
 
 def disconnect():
@@ -47,7 +51,7 @@ def disconnect():
 	if ser.isOpen():
 		ser.write("#") #stop automatic status sending on arduino
 	ser.close()
-	print("serial port disconnected")
+	debug("serial port disconnected")
 
 
 def updateStatus():
@@ -57,7 +61,7 @@ def updateStatus():
 	try:
 		ser.write("@")
 	except:
-		print "[Error] sending @\r\n"
+		debug("Error sending @")
 		return
 
 
@@ -67,7 +71,7 @@ def updateStatus():
 		try:
 			data = ser.read(1)
 		except:
-			print "[Error] reading 1 byte"
+			debug("Error reading 1 byte")
 			return
 
 		datastring += data
@@ -118,7 +122,7 @@ def sendCmd(cmd):
 	try:
 		ser.write(cmd+"\r")
 	except:
-		print "[Error] sending cmd\r\n"
+		debug("Error sending cmd")
 		
 
 def ReadFifo_control_pwr(i):
@@ -133,11 +137,11 @@ def ReadFifo_control_pwr(i):
             		raise err
     	if data == "0":
 		cmd = str(i) + " OFF"
-		print "sendCmd(\"" + cmd + "\")\r\n"
+		debug("sendCmd(\"" + cmd + "\")")
 		sendCmd(cmd)
 	elif data == "1":
 		cmd = str(i) + " ON"
-		print "sendCmd(\"" + cmd + "\")\r\n"
+		debug("sendCmd(\"" + cmd + "\")")
 		sendCmd(cmd)
 
 	os.close(pipe)
