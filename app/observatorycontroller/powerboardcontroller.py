@@ -239,10 +239,11 @@ def createFifos():
 		mkfifo(fifo_control_path + name)
 
 	#strangely needed to enable other python script to write in pipe
-	for i in range(10):
-		for name in control:
-			os.system("echo \"-\\c\" > " + fifo_control_path + name + " &")
-			time.sleep(0.01)	
+#	time.sleep(2)
+#	for i in range(10):
+#		for name in control:
+#			os.system("echo '-' | tee " + fifo_control_path + name + " &")
+#			time.sleep(0.01)	
 
 
 def deleteFifos():

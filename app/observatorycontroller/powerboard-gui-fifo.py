@@ -140,12 +140,14 @@ def readFifo(i):
 
 def writeFifo(i, data):
 	fifo_path = fifo_control_path + str(i)
-	cmd = "echo  \"" + data + "\\c\" > " + fifo_path
+	
+	for i in range(10):
+		cmd = "echo  '" + data + "' > " + fifo_path
 
-	pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
-	debug("system(" + cmd + ")")
-	os.system(cmd)
-	os.close(pipe)	
+	#pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
+		debug("system(" + cmd + ")")
+		os.system(cmd)
+	#os.close(pipe)	
 
 	#try:
 	#	pipe = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
@@ -348,7 +350,7 @@ def updateStatus():
 
 
 		StateUpdater()
-		time.sleep(1)
+		time.sleep(0.1)
 
 
 
