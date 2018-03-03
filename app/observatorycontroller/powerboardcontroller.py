@@ -120,7 +120,7 @@ def updateStatus():
 	data = ''
 	
 	serialWrite("@")
-	time.sleep(0.25)
+#	time.sleep(0.25)
 
 	while ser.inWaiting() > 0:
 		data = serialRead(1)
@@ -145,23 +145,23 @@ def updateStatus():
 				board_state = False
 
 			if board_state == True:
-				WriteFifo_status("board_state", "OK\r\n")
-				WriteFifo_status("board_vin", item[2] + "\r\n")
-				WriteFifo_status(1, item[3] + "\r\n")
-				WriteFifo_status(2, item[4] + "\r\n")
-				WriteFifo_status(3, item[5] + "\r\n")
-				WriteFifo_status(4, item[6] + "\r\n")
-				WriteFifo_status(5, item[7] + "\r\n")
-				WriteFifo_status(6, item[8] + "\r\n")
+				WriteFifo_status("board_state", "O")
+				WriteFifo_status("board_vin", item[2])
+				WriteFifo_status(1, item[3])
+				WriteFifo_status(2, item[4])
+				WriteFifo_status(3, item[5])
+				WriteFifo_status(4, item[6])
+				WriteFifo_status(5, item[7])
+				WriteFifo_status(6, item[8])
 			else:
-				WriteFifo_status("board_state", "ERR\r\n")
-				WriteFifo_status("board_vin", "ERR\r\n")
-				WriteFifo_status(1, "ERR\r\n")
-				WriteFifo_status(2, "ERR\r\n")
-				WriteFifo_status(3, "ERR\r\n")
-				WriteFifo_status(4, "ERR\r\n")
-				WriteFifo_status(5, "ERR\r\n")
-				WriteFifo_status(6, "ERR\r\n")
+				WriteFifo_status("board_state", "E")
+				WriteFifo_status("board_vin", "E")
+				WriteFifo_status(1, "E")
+				WriteFifo_status(2, "E")
+				WriteFifo_status(3, "E")
+				WriteFifo_status(4, "E")
+				WriteFifo_status(5, "E")
+				WriteFifo_status(6, "E")
 				
 	return
 
@@ -276,7 +276,7 @@ def ReadFifo_control(i):
 		sendCmd(cmd)
 
 	os.close(pipe)
-	time.sleep(0.01)
+#	time.sleep(0.01)
 	return
 
 
