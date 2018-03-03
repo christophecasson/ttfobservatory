@@ -117,19 +117,19 @@ def closefifos():
 def readFifo(i):
 	fifo_path = fifo_status_path + str(i)
 	try:
-		fifo = os.open(fifo_path , os.O_RDONLY | os.O_NONBLOCK)
-		debug(fifo_path + " opened")
-		time.sleep(0.25)
+		fifo = os.open(fifo_path , os.O_RDONLY )#| os.O_NONBLOCK)
+#		debug(fifo_path + " opened")
+#		time.sleep(0.25)
 		data = os.read(fifo, 1)
-		debug("OK read " + data + " to " + fifo_path)
     		os.close(fifo)
-		debug("fifo closed")
+#		debug("OK read [" + data + "] to " + fifo_path)
+#		debug("fifo closed")
 		#debug("read data from pipe=" + str(fifo) + ") : " + data)
 		#time.sleep(0.1)
     		return data
 	except OSError as err:
         	if err.errno == 11:
-			debug("errno 11")
+#			debug("errno 11")
 			return
         	else:
             		raise err
@@ -140,16 +140,23 @@ def readFifo(i):
 
 def writeFifo(i, data):
 	fifo_path = fifo_control_path + str(i)
-	try:
-		pipe = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
-		debug(fifo_path + " opened")
-		os.write(pipe, data)
-		debug("OK write " + data + " to " + fifo_path)
-		os.close(pipe)
-		debug("fifo closed")
-	except:
-		debug("except writing " + data + " to " + fifo_path)
-		return
+	cmd = "echo  \"" + data + "\\c\" > " + fifo_path
+
+	pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
+	debug("system(" + cmd + ")")
+	os.system(cmd)
+	os.close(pipe)	
+
+	#try:
+	#	pipe = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
+	#	debug(fifo_path + " opened")
+	#	os.write(pipe, data)
+	#	debug("OK write " + data + " to " + fifo_path)
+	#	os.close(pipe)
+	#	debug("fifo closed")
+	#except:
+	#	debug("except writing " + data + " to " + fifo_path)
+	#	return
 
 	return
 
@@ -341,7 +348,7 @@ def updateStatus():
 
 
 		StateUpdater()
-		time.sleep(0.1)
+		time.sleep(1)
 
 
 
@@ -370,7 +377,7 @@ def press(button):
 		if btn_out2_state == False:
 			writeFifo(2, "1")
 		else:
-			writeFifo(1, "0")
+			writeFifo(2, "0")
 
 	if button == "btn_out3":
 		if btn_out3_state == False:

@@ -10,7 +10,28 @@ import serial
 
 
 
+fifo_root_path 	= "/home/astro/fifo/"
+fifo_board_path = fifo_root_path + "powerboard/"
+fifo_status_path = fifo_board_path + "status/"
+fifo_control_path = fifo_board_path + "control/"
 
+status = {	"board_state":"O",
+		"board_vin":"00000", 
+		"1":"0",
+		"2":"0", 
+		"3":"0", 
+		"4":"0", 
+		"5":"0", 
+		"6":"0"
+}  
+
+control = {	"1":"",
+		"2":"", 
+		"3":"", 
+		"4":"", 
+		"5":"", 
+		"6":""
+}  
 
 
 
@@ -18,7 +39,6 @@ import serial
 serialport = str(sys.argv[1])
 serialportbaudrate = 9600
 
-board_state = False
 
 #handle debug log
 def debug(text):
@@ -81,14 +101,14 @@ def disconnect():
 def reconnect():
 	debug("reconnecting serial port...")
 	
-	WriteFifo_status("board_state", "ERR\r\n")
-	WriteFifo_status("board_vin", "ERR\r\n")
-	WriteFifo_status(1, "ERR\r\n")
-	WriteFifo_status(2, "ERR\r\n")
-	WriteFifo_status(3, "ERR\r\n")
-	WriteFifo_status(4, "ERR\r\n")
-	WriteFifo_status(5, "ERR\r\n")
-	WriteFifo_status(6, "ERR\r\n")
+	status["board_state"] = "E"
+	status["board_vin"] = "E"
+	status["1"] = "E"
+	status["2"] = "E"
+	status["3"] = "E"
+	status["4"] = "E"
+	status["5"] = "E"
+	status["6"] = "E"
 	
 	try: 
 		ser.close()
@@ -132,6 +152,8 @@ def updateStatus():
 		if data == "$":
 			#datastring = "@-O-12036-1-1-1-0-1-0-$"
 			item = datastring.split('-')
+			if len(item) != 10:
+				return
 
 			board_state = True
 				
@@ -145,30 +167,28 @@ def updateStatus():
 				board_state = False
 
 			if board_state == True:
-				WriteFifo_status("board_state", "O")
-				WriteFifo_status("board_vin", item[2])
-				WriteFifo_status(1, item[3])
-				WriteFifo_status(2, item[4])
-				WriteFifo_status(3, item[5])
-				WriteFifo_status(4, item[6])
-				WriteFifo_status(5, item[7])
-				WriteFifo_status(6, item[8])
+				status["board_state"] = "O"
+				status["board_vin"] = item[2]
+				status["1"] = item[3]
+				status["2"] = item[4]
+				status["3"] = item[5]
+				status["4"] = item[6]
+				status["5"] = item[7]
+				status["6"] = item[8]
 			else:
-				WriteFifo_status("board_state", "E")
-				WriteFifo_status("board_vin", "E")
-				WriteFifo_status(1, "E")
-				WriteFifo_status(2, "E")
-				WriteFifo_status(3, "E")
-				WriteFifo_status(4, "E")
-				WriteFifo_status(5, "E")
-				WriteFifo_status(6, "E")
+				status["board_state"] = "E"
+				status["board_vin"] = "E"
+				status["1"] = "E"
+				status["2"] = "E"
+				status["3"] = "E"
+				status["4"] = "E"
+				status["5"] = "E"
+				status["6"] = "E"
 				
 	return
 
 
 
-def sendCmd(cmd):
-	serialWrite(cmd+"\r")
 
 		
 
@@ -206,48 +226,31 @@ def rmdir(path):
 	
 
 
-fifo_root_path 	= "/home/astro/fifo/"
-fifo_board_path = fifo_root_path + "powerboard/"
-fifo_status_path = fifo_board_path + "status/"
-fifo_control_path = fifo_board_path + "control/"
 
 
 def createFifos():
 	mkdir(fifo_status_path)
 	mkdir(fifo_control_path)
 
-	mkfifo(fifo_status_path + "board_state")
-	mkfifo(fifo_status_path + "board_vin")
-	mkfifo(fifo_status_path + "1")
-	mkfifo(fifo_status_path + "2")
-	mkfifo(fifo_status_path + "3")
-	mkfifo(fifo_status_path + "4")
-	mkfifo(fifo_status_path + "5")
-	mkfifo(fifo_status_path + "6")
+	for name in status:
+		mkfifo(fifo_status_path + name)
 
-	mkfifo(fifo_control_path + "1")
-	mkfifo(fifo_control_path + "2")
-	mkfifo(fifo_control_path + "3")
-	mkfifo(fifo_control_path + "4")
-	mkfifo(fifo_control_path + "5")
-	mkfifo(fifo_control_path + "6")
+	for name in control:
+		mkfifo(fifo_control_path + name)
+
+	#strangely needed to enable other python script to write in pipe
+	for i in range(10):
+		for name in control:
+			os.system("echo \"-\\c\" > " + fifo_control_path + name + " &")
+			time.sleep(0.01)	
+
 
 def deleteFifos():
-	rmfile(fifo_status_path + "board_state")
-	rmfile(fifo_status_path + "board_vin")
-	rmfile(fifo_status_path + "1")
-	rmfile(fifo_status_path + "2")
-	rmfile(fifo_status_path + "3")
-	rmfile(fifo_status_path + "4")
-	rmfile(fifo_status_path + "5")
-	rmfile(fifo_status_path + "6")
+	for name in status:
+		rmfile(fifo_status_path + name)	
 
-	rmfile(fifo_control_path + "1")
-	rmfile(fifo_control_path + "2")
-	rmfile(fifo_control_path + "3")
-	rmfile(fifo_control_path + "4")
-	rmfile(fifo_control_path + "5")
-	rmfile(fifo_control_path + "6")
+	for name in control:
+		rmfile(fifo_control_path + name)	
 
 	rmdir(fifo_status_path)
 	rmdir(fifo_control_path)
@@ -255,52 +258,53 @@ def deleteFifos():
 
 
 
-
-def ReadFifo_control(i):
-	fifo_path = fifo_control_path + str(i)
-	try:
-		pipe = os.open(fifo_path , os.O_RDONLY | os.O_NONBLOCK)
-		data = os.read(pipe, 1)
-	except OSError as err:
-        	if err.errno == 11:
-			return
-        	else:
-            		raise err
-    	if data == "0":
-		cmd = str(i) + " OFF"
-		debug("sendCmd(\"" + cmd + "\")")
-		sendCmd(cmd)
-	elif data == "1":
-		cmd = str(i) + " ON"
-		debug("sendCmd(\"" + cmd + "\")")
-		sendCmd(cmd)
-
-	os.close(pipe)
-#	time.sleep(0.01)
-	return
+def sendCmd(cmd):
+	debug("sendCmd(\"" + cmd + "\")")
+	serialWrite(cmd+"\r")
 
 
-def WriteFifo_status(i, data):
-	fifo_path = fifo_status_path + str(i)
-	try:
-		pipe = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
-		os.write(pipe, data)
-	except:
-		return
+def ReadFIFOs_control():
+	for name in control:
+		fifo_path = fifo_control_path + name
+		try:
+			pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
+			data = os.read(pipe, 1)
+		except OSError as err:
+			if err.errno == 11:
+				return
+			else:
+				raise err
 
-	os.close(pipe)
-	return
+		if data == "0":
+			sendCmd(name + " OFF")
+		elif data == "1":
+			sendCmd(name + " ON")
+
+		os.close(pipe)
+
+
+def WriteFIFOs_status():
+	for name in status:
+		fifo_path = fifo_status_path + name
+		cmd = "echo \"" + status[name] + "\\c\" > " + fifo_path
+		pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
+		os.system(cmd)
+		os.close(pipe)
+
+
 
 
 
 connect()
 createFifos()
+ReadFIFOs_control()
+time.sleep(2)
+
+
+debug("Init done!")
 
 while True:
-	for i in range(1,7):
-		ReadFifo_control(i)
-		
-	updateStatus()
+	updateStatus()	
+	WriteFIFOs_status()
+	ReadFIFOs_control()
 
-disconnect()
-deleteFifos()
