@@ -41,8 +41,10 @@ btn_out4_state = False
 btn_out5_state = False
 btn_out6_state = False
 
-board_state = False
-board_vin = 0
+board_state = "Init..."
+last_board_state = "Init..."
+board_vin = "Init..."
+last_board_vin = "Init..."
 
 last_btn_out1_state = False
 last_btn_out2_state = False
@@ -51,8 +53,6 @@ last_btn_out4_state = False
 last_btn_out5_state = False
 last_btn_out6_state = False
 
-last_board_state = False
-last_board_vin = 0
 
 closeapp = False
 
@@ -64,103 +64,39 @@ fifo_status_path = fifo_board_path + "status/"
 fifo_control_path = fifo_board_path + "control/"
 
 
-fifo_boardstate = 0
-fifo_vin = 0
-fifo_1 = 0
-fifo_2 = 0
-fifo_3 = 0
-fifo_4 = 0
-fifo_5 = 0
-fifo_6 = 0
-
-def openfifos():
-	global fifo_boardstate
-	global fifo_vin
-	global fifo_1
-	global fifo_2
-	global fifo_3
-	global fifo_4
-	global fifo_5
-	global fifo_6
-
-	fifo_boardstate = os.open(fifo_status_path + "board_state", os.O_RDONLY | os.O_NONBLOCK)
-	fifo_vin = os.open(fifo_status_path + "board_vin", os.O_RDONLY | os.O_NONBLOCK)
-	fifo_1 = os.open(fifo_status_path + "1", os.O_RDONLY | os.O_NONBLOCK)
-	fifo_2 = os.open(fifo_status_path + "2", os.O_RDONLY | os.O_NONBLOCK)
-	fifo_3 = os.open(fifo_status_path + "3", os.O_RDONLY | os.O_NONBLOCK)
-	fifo_4 = os.open(fifo_status_path + "4", os.O_RDONLY | os.O_NONBLOCK)
-	fifo_5 = os.open(fifo_status_path + "5", os.O_RDONLY | os.O_NONBLOCK)
-	fifo_6 = os.open(fifo_status_path + "6", os.O_RDONLY | os.O_NONBLOCK)
-
-def closefifos():
-	global fifo_boardstate
-	global fifo_vin
-	global fifo_1
-	global fifo_2
-	global fifo_3
-	global fifo_4
-	global fifo_5
-	global fifo_6
-	
-	os.close(fifo_boardstate)
-	os.close(fifo_vin)
-	os.close(fifo_1)
-	os.close(fifo_2)
-	os.close(fifo_3)
-	os.close(fifo_4)
-	os.close(fifo_5)
-	os.close(fifo_6)
-
-
-
 
 def readFifo(i):
 	fifo_path = fifo_status_path + str(i)
 	try:
-		fifo = os.open(fifo_path , os.O_RDONLY )#| os.O_NONBLOCK)
-#		debug(fifo_path + " opened")
-#		time.sleep(0.25)
-		data = os.read(fifo, 1)
-    		os.close(fifo)
-#		debug("OK read [" + data + "] to " + fifo_path)
-#		debug("fifo closed")
-		#debug("read data from pipe=" + str(fifo) + ") : " + data)
-		#time.sleep(0.1)
-    		return data
+		pipe = os.open(fifo_path , os.O_RDONLY )#| os.O_NONBLOCK)
+		data = os.read(pipe, 4096)
+    		os.close(pipe)
 	except OSError as err:
         	if err.errno == 11:
-#			debug("errno 11")
 			return
         	else:
             		raise err
-    
+   	if data!= '':
+		item = data.split()
+		lastitem = item[len(item)-1]
+		return lastitem
+	else:
+		return '' 
 
 
 
 
 def writeFifo(i, data):
 	fifo_path = fifo_control_path + str(i)
-	
-	for i in range(10):
-		cmd = "echo  '" + data + "' > " + fifo_path
-
-	#pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
-		debug("system(" + cmd + ")")
-		os.system(cmd)
-	#os.close(pipe)	
-
-	#try:
-	#	pipe = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
-	#	debug(fifo_path + " opened")
-	#	os.write(pipe, data)
-	#	debug("OK write " + data + " to " + fifo_path)
-	#	os.close(pipe)
-	#	debug("fifo closed")
-	#except:
-	#	debug("except writing " + data + " to " + fifo_path)
-	#	return
-
-	return
+	while True:
+		try:
+			pipe = os.open(fifo_path, os.O_WRONLY )#| os.O_NONBLOCK)
+			os.write(pipe, data + "\n")
+			os.close(pipe)
+			return
+		except:
+			debug("except writing " + data + " to " + fifo_path)
+			pass
 
 
 
@@ -177,12 +113,12 @@ def StateUpdater():
 	global last_board_vin
 
 	if last_board_vin != board_vin:
-		app.setLabel("l_Vin", str(board_vin)+" mV")
+		app.setLabel("l_Vin", "Vin="+board_vin)
 	
-	if board_state == False:
+	if board_state != "OK":
 		if board_state != last_board_state:
 			last_board_state = board_state
-			app.setLabel("l_BoardStatus", "BOARD ERROR")
+			app.setLabel("l_BoardStatus", "Board " + board_state)
 			app.setBg("#500000")
 			setButtonUnknown("btn_out1")
 			setButtonUnknown("btn_out2")
@@ -194,7 +130,7 @@ def StateUpdater():
 	else:
 		if board_state != last_board_state:
 			last_board_state = board_state
-			app.setLabel("l_BoardStatus", "BOARD OK")
+			app.setLabel("l_BoardStatus", "Board " + board_state)
 			app.setBg("#202020")
 			last_btn_out1_state = not btn_out1_state
 			last_btn_out2_state = not btn_out2_state
@@ -286,19 +222,10 @@ def updateStatus():
 
 	while closeapp == False:
 
-		data = readFifo("board_state")
-		if data == "O":
-			board_state = True
-			#data = readFifo(fifo_boardstate)
-			#if data == 'K':
-			#	board_state = True
-			#else:
-			#	board_state = False
-		else:
-			board_state = False
+		board_state = readFifo("board_state")
+		board_vin = readFifo("board_vin")
 
-
-		if board_state == True:
+		if board_state == "OK":
 			
 			data = readFifo(1)
 			if data == '0':
@@ -410,16 +337,11 @@ def press(button):
 
 
 # create a GUI variable called app
-app = gui("Power Board", "220x600", handleArgs=False)
+app = gui("Power Board", "225x600", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
 app.setFont(24)
 
-
-
-
-#app.addButton("Update", press, 0, 1)
-#app.setButton("Update", "Update status")
 
 
 app.addLabel("l_out1", "1: Roof", 1, 0)
@@ -455,10 +377,9 @@ setButtonUnknown("btn_out6")
 
 app.addLabel("l_BoardStatus")
 app.addLabel("l_Vin")
+app.getLabelWidget("l_Vin").config(font="Courier 18")
 
 
-#openfifos()
-#time.sleep(1)
 
 
 app.thread(updateStatus)
@@ -467,9 +388,7 @@ app.thread(updateStatus)
 # start the GUI
 app.go()
 
-
 closeapp = True
-#app.stop()
 
 
 
