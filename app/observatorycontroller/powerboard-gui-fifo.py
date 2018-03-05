@@ -34,24 +34,27 @@ signal.signal(signal.SIGTERM, sigterm_handler)
 
 
 
-btn_out1_state = False
-btn_out2_state = False
-btn_out3_state = False
-btn_out4_state = False
-btn_out5_state = False
-btn_out6_state = False
+btn_state = {		"1":"-",
+			"2":"-",
+			"3":"-",
+			"4":"-",
+			"5":"-",
+			"6":"-"
+}
+
+last_btn_state = {	"1":"-",
+			"2":"-",
+			"3":"-",
+			"4":"-",
+			"5":"-",
+			"6":"-"
+}
+
 
 board_state = "Init..."
 last_board_state = "Init..."
 board_vin = "Init..."
 last_board_vin = "Init..."
-
-last_btn_out1_state = False
-last_btn_out2_state = False
-last_btn_out3_state = False
-last_btn_out4_state = False
-last_btn_out5_state = False
-last_btn_out6_state = False
 
 
 closeapp = False
@@ -84,8 +87,6 @@ def readFifo(i):
 		return '' 
 
 
-
-
 def writeFifo(i, data):
 	fifo_path = fifo_control_path + str(i)
 	while True:
@@ -100,15 +101,43 @@ def writeFifo(i, data):
 
 
 
+def setButtonON(button):
+	app.setButton(button, " ON  ")
+	app.setButtonBg(button, "red")
+	app.setButtonFg(button, "#202020")
+	
+def setButtonOFF(button):
+	app.setButton(button, " OFF ")
+	app.setButtonBg(button, "#202020")
+	app.setButtonFg(button, "#AAAAAA")
 
+def setButtonUnknown(button):
+	app.setButton(button, "  -  ")
+	app.setButtonBg(button, "#808080")
+	app.setButtonFg(button, "#DDDDDD")
+
+
+#thread : data updater
+def updateStatus():
+	global board_state
+	global board_vin
+	global btn_state
+
+	while closeapp == False:
+		board_state = readFifo("board_state")
+		board_vin = readFifo("board_vin")
+
+		if board_state == "OK":
+			for name in btn_state:
+				btn_state[name] = readFifo(name)
+
+		StateUpdater()
+		time.sleep(0.1)
+
+#GUI updater
 def StateUpdater():
 
-	global last_btn_out1_state
-	global last_btn_out2_state
-	global last_btn_out3_state
-	global last_btn_out4_state
-	global last_btn_out5_state
-	global last_btn_out6_state
+	global last_btn_state
 	global last_board_state
 	global last_board_vin
 
@@ -120,223 +149,42 @@ def StateUpdater():
 			last_board_state = board_state
 			app.setLabel("l_BoardStatus", "Board " + board_state)
 			app.setBg("#500000")
-			setButtonUnknown("btn_out1")
-			setButtonUnknown("btn_out2")
-			setButtonUnknown("btn_out3")
-			setButtonUnknown("btn_out4")
-			setButtonUnknown("btn_out5")
-			setButtonUnknown("btn_out6")
+			for name in btn_state:
+				setButtonUnknown("btn_out"+name)
 
 	else:
 		if board_state != last_board_state:
 			last_board_state = board_state
 			app.setLabel("l_BoardStatus", "Board " + board_state)
 			app.setBg("#202020")
-			last_btn_out1_state = not btn_out1_state
-			last_btn_out2_state = not btn_out2_state
-			last_btn_out3_state = not btn_out3_state
-			last_btn_out4_state = not btn_out4_state
-			last_btn_out5_state = not btn_out5_state
-			last_btn_out6_state = not btn_out6_state
-			
+			for name in btn_state:
+				last_btn_state[name] = not btn_state[name]
 
-		if btn_out1_state != last_btn_out1_state:
-			last_btn_out1_state = btn_out1_state
-			if btn_out1_state == False:
-				setButtonOFF("btn_out1")
-			else:
-				setButtonON("btn_out1")
-
-		if btn_out2_state != last_btn_out2_state:
-			last_btn_out2_state = btn_out2_state
-			if btn_out2_state == False:
-				setButtonOFF("btn_out2")
-			else:
-				setButtonON("btn_out2")
-
-		if btn_out3_state != last_btn_out3_state:
-			last_btn_out3_state = btn_out3_state
-			if btn_out3_state == False:
-				setButtonOFF("btn_out3")
-			else:
-				setButtonON("btn_out3")
-
-		if btn_out4_state != last_btn_out4_state:
-			last_btn_out4_state = btn_out4_state
-			if btn_out4_state == False:
-				setButtonOFF("btn_out4")
-			else:
-				setButtonON("btn_out4")
-
-		if btn_out5_state != last_btn_out5_state:
-			last_btn_out5_state = btn_out5_state
-			if btn_out5_state == False:
-				setButtonOFF("btn_out5")
-			else:
-				setButtonON("btn_out5")
-
-		if btn_out6_state != last_btn_out6_state:
-			last_btn_out6_state = btn_out6_state
-			if btn_out6_state == False:
-				setButtonOFF("btn_out6")
-			else:
-				setButtonON("btn_out6")
-
-
-
-
-
-
-def setButtonON(button):
-	app.setButton(button, " ON  ")
-	app.setButtonBg(button, "red")
-	app.setButtonFg(button, "#202020")
-	
-
-def setButtonOFF(button):
-	app.setButton(button, " OFF ")
-	app.setButtonBg(button, "#202020")
-	app.setButtonFg(button, "#AAAAAA")
-
-
-def setButtonUnknown(button):
-	app.setButton(button, "  -  ")
-	app.setButtonBg(button, "#808080")
-	app.setButtonFg(button, "#DDDDDD")
-
-
-
-def updateStatus():
-
-	global app
-
-	global board_state
-	global board_vin
-
-	global btn_out1_state
-	global btn_out2_state
-	global btn_out3_state
-	global btn_out4_state
-	global btn_out5_state
-	global btn_out6_state
-
-	while closeapp == False:
-
-		board_state = readFifo("board_state")
-		board_vin = readFifo("board_vin")
-
-		if board_state == "OK":
-			
-			data = readFifo(1)
-			if data == '0':
-				btn_out1_state = False
-			elif data == '1':
-				btn_out1_state = True
-			else:
-				board_state = False
-
-			data = readFifo(2)
-			if data == '0':
-				btn_out2_state = False
-			elif data == '1':
-				btn_out2_state = True
-			else:
-				board_state = False
-
-			data = readFifo(3)
-			if data == '0':
-				btn_out3_state = False
-			elif data == '1':
-				btn_out3_state = True
-			else:
-				board_state = False
-
-			data = readFifo(4)
-			if data == '0':
-				btn_out4_state = False
-			elif data == '1':
-				btn_out4_state = True
-			else:
-				board_state = False
-
-			data = readFifo(5)
-			if data == '0':
-				btn_out5_state = False
-			elif data == '1':
-				btn_out5_state = True
-			else:
-				board_state = False
-
-			data = readFifo(6)
-			if data == '0':
-				btn_out6_state = False
-			elif data == '1':
-				btn_out6_state = True
-			else:
-				board_state = False
-
-
-		StateUpdater()
-		time.sleep(0.1)
-
-
-
-
-
-
-
-	
-	
-
-
-
-					
+		for name in btn_state:
+			if btn_state[name] != last_btn_state[name]:
+				last_btn_state[name] = btn_state[name]
+				if btn_state[name] == "0":
+					setButtonOFF("btn_out"+name)
+				elif btn_state[name] == "1":
+					setButtonON("btn_out"+name)
+				else:
+					setButtonUnknown("btn_out"+name)
 
 
 # handle button events
 def press(button):
-
-	if button == "btn_out1":
-		if btn_out1_state == False:
-			writeFifo(1, "1")
-		else:
-			writeFifo(1, "0")
-
-	if button == "btn_out2":
-		if btn_out2_state == False:
-			writeFifo(2, "1")
-		else:
-			writeFifo(2, "0")
-
-	if button == "btn_out3":
-		if btn_out3_state == False:
-			writeFifo(3, "1")
-		else:
-			writeFifo(3, "0")
-
-	if button == "btn_out4":
-		if btn_out4_state == False:
-			writeFifo(4, "1")
-		else:
-			writeFifo(4, "0")
-
-	if button == "btn_out5":
-		if btn_out5_state == False:
-			writeFifo(5, "1")
-		else:
-			writeFifo(5, "0")
-
-	if button == "btn_out6":
-		if btn_out6_state == False:
-			writeFifo(6, "1")
-		else:
-			writeFifo(6, "0")
+	for name in btn_state:
+		if button == "btn_out"+name:
+			if btn_state[name] == "0":
+				writeFifo(name, "1")
+			elif btn_state[name] == "1":
+				writeFifo(name, "0")
+			else:
+				pass
 
 
 
-
-
-# create a GUI variable called app
+# create GUI
 app = gui("Power Board", "225x600", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
@@ -381,13 +229,13 @@ app.getLabelWidget("l_Vin").config(font="Courier 18")
 
 
 
-
+#start update thread
 app.thread(updateStatus)
-
 
 # start the GUI
 app.go()
 
+#close update thread
 closeapp = True
 
 
