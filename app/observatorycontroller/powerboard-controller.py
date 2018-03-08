@@ -8,12 +8,11 @@ import sys
 import signal
 import serial
 
+from tools import *
+
+BOARDNAME = "powerboard"
 
 
-fifo_root_path 	= "/home/astro/fifo/"
-fifo_board_path = fifo_root_path + "powerboard/"
-fifo_status_path = fifo_board_path + "status/"
-fifo_control_path = fifo_board_path + "control/"
 
 status = {	"board_state":"Connecting",
 		"board_vin":"Connecting", 
@@ -35,15 +34,6 @@ control = {	"1":"",
 
 
 
-
-serialport = str(sys.argv[1])
-serialportbaudrate = 9600
-
-
-#handle debug log
-def debug(text):
-	print "[ powerboardcontroller.py - " + str(datetime.now()) + " ] \t" + text 
-
 #handle Ctrl-C (SIGINT) and Kill (SIGTERM) properly
 def sigint_handler(signum, frame):
 	debug("SIGINT received!   Closing connections...")
@@ -58,12 +48,75 @@ def sigterm_handler(signum, frame):
 	disconnect()
 	debug("exit(0)")
 	sys.exit(0)
- 
+
 signal.signal(signal.SIGINT, sigint_handler)
 signal.signal(signal.SIGTERM, sigterm_handler)
 
 
 
+#fifo stuff
+fifo_board_path = fifo_root_path + BOARDNAME + "/"
+fifo_status_path = fifo_board_path + "status/"
+fifo_control_path = fifo_board_path + "control/"
+
+def createFifos():
+	mkdir(fifo_status_path)
+	mkdir(fifo_control_path)
+
+	for name in status:
+		mkfifo(fifo_status_path + name)
+
+	for name in control:
+		mkfifo(fifo_control_path + name)
+
+def deleteFifos():
+	for name in status:
+		rmfile(fifo_status_path + name)	
+
+	for name in control:
+		rmfile(fifo_control_path + name)	
+
+	rmdir(fifo_status_path)
+	rmdir(fifo_control_path)
+	rmdir(fifo_board_path)
+
+def ReadFIFOs_control():
+	for name in control:
+		fifo_path = fifo_control_path + name
+		try:
+			pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
+			data = os.read(pipe, 4096)
+			os.close(pipe)
+		except OSError as err:
+			if err.errno == 11:
+				return
+			else:
+				raise err
+		if data != '':
+			item = data.split()
+			lastitem = item[len(item)-1]
+
+			if lastitem == "0":
+				sendCmd(name + " OFF")
+			elif lastitem == "1":
+				sendCmd(name + " ON")
+
+def WriteFIFOs_status():
+	for name in status:
+		try:
+			fifo_path = fifo_status_path + name
+			pipe = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
+			os.write(pipe, status[name] + "\n")
+			os.close(pipe)		
+		except:
+			pass
+
+
+
+
+#serial port stuff
+serialport = str(sys.argv[1])
+serialportbaudrate = 9600
 
 def connect():
 	global ser
@@ -86,9 +139,7 @@ def connect():
 		except serial.SerialException:
 			WriteFIFOs_status()
 			time.sleep(1)	
-		
-
-
+	
 def disconnect():
 	try:
 		global ser
@@ -118,7 +169,6 @@ def reconnect():
 
 	connect()
 
-
 def serialRead(len):
 	try:
 		data = ser.read(len)
@@ -134,6 +184,21 @@ def serialWrite(data):
 	except serial.SerialException:
 		debug("Error sending " + str(data) )
 		reconnect()
+
+def sendCmd(cmd):
+	debug("sendCmd(\"" + cmd + "\")")
+	serialWrite(cmd+"\r")
+
+
+
+
+
+
+
+
+
+
+
 
 
 def updateStatus():
@@ -191,117 +256,11 @@ def updateStatus():
 
 
 
-		
-
-def mkdir(path):
-	try:
-		os.stat(path)
-		debug("directory exists ( " + path + " )")
-	except:
-		os.makedirs(path)
-		debug("directory created ( " + path + " )")
-
-def mkfifo(path):
-	try:
-		os.stat(path)
-		debug("fifo exists ( " + path + " )")
-	except:
-		os.mkfifo(path)
-		debug("fifo created ( " + path + " )")
-	
-def rmfile(path):
-	try:
-		os.stat(path)
-		os.remove(path)
-		debug("file deleted ( " + path + " )")
-	except:
-		debug("error deleting file ( " + path + " )")
-
-def rmdir(path):
-	try:
-		os.stat(path)
-		os.rmdir(path)
-		debug("directory deleted ( " + path + " )")
-	except:
-		debug("error deleting directory ( " + path + " )")
-	
 
 
 
 
-def createFifos():
-	mkdir(fifo_status_path)
-	mkdir(fifo_control_path)
-
-	for name in status:
-		mkfifo(fifo_status_path + name)
-
-	for name in control:
-		mkfifo(fifo_control_path + name)
-
-
-
-def deleteFifos():
-	for name in status:
-		rmfile(fifo_status_path + name)	
-
-	for name in control:
-		rmfile(fifo_control_path + name)	
-
-	rmdir(fifo_status_path)
-	rmdir(fifo_control_path)
-	rmdir(fifo_board_path)
-
-
-
-def sendCmd(cmd):
-	debug("sendCmd(\"" + cmd + "\")")
-	serialWrite(cmd+"\r")
-
-
-def ReadFIFOs_control():
-	for name in control:
-		fifo_path = fifo_control_path + name
-		try:
-			pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
-			data = os.read(pipe, 4096)
-			os.close(pipe)
-		except OSError as err:
-			if err.errno == 11:
-				return
-			else:
-				raise err
-		if data != '':
-			item = data.split()
-			lastitem = item[len(item)-1]
-
-			if lastitem == "0":
-				sendCmd(name + " OFF")
-			elif lastitem == "1":
-				sendCmd(name + " ON")
-
-
-
-def WriteFIFOs_status():
-	for name in status:
-		try:
-			fifo_path = fifo_status_path + name
-			pipe = os.open(fifo_path, os.O_WRONLY | os.O_NONBLOCK)
-			os.write(pipe, status[name] + "\n")
-			os.close(pipe)		
-		except:
-			#debug("except writing " + status[name] + " to " + fifo_path)
-			pass
-
-		#cmd = "echo \"" + status[name] + "\\c\" > " + fifo_path
-		#pipe = os.open(fifo_path, os.O_RDONLY | os.O_NONBLOCK)
-		#os.system(cmd)
-		#os.close(pipe)
-
-
-
-
-
+#main code
 connect()
 createFifos()
 debug("Init done!")
@@ -311,15 +270,4 @@ while True:
 	WriteFIFOs_status()
 	ReadFIFOs_control()
 	time.sleep(0.1)
-
-
-
-
-
-
-
-
-
-
-
 
