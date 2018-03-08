@@ -84,6 +84,7 @@ def connect():
 			return
 
 		except serial.SerialException:
+			WriteFIFOs_status()
 			time.sleep(1)	
 		
 

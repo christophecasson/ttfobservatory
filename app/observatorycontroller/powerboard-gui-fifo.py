@@ -130,6 +130,9 @@ def updateStatus():
 		if board_state == "OK":
 			for name in btn_state:
 				btn_state[name] = readFifo(name)
+		else:
+			for name in btn_state:
+				btn_state[name] = "-"
 
 		StateUpdater()
 		time.sleep(0.1)
