@@ -11,24 +11,18 @@ import signal
 
 from tools import *
 
-BOARDNAME = "powerboard"
+BOARDNAME = "roof"
 
 
 
-btn_state = {		"1":"-",
-			"2":"-",
-			"3":"-",
-			"4":"-",
-			"5":"-",
-			"6":"-"
+roofstate = {		"state":"-",
+			"opened":"-",
+			"closed":"-"
 }
 
-last_btn_state = {	"1":"-",
-			"2":"-",
-			"3":"-",
-			"4":"-",
-			"5":"-",
-			"6":"-"
+last_roofstate = {	"state":"-",
+			"opened":"-",
+			"closed":"-"
 }
 
 board_state = "Init..."
@@ -126,18 +120,14 @@ def setButtonUnknown(button):
 def updateStatus():
 	global board_state
 	global board_vin
-	global btn_state
+	global roofstate
 
 	while closeapp == False:
 		board_state = readFifo("board_state")
 		board_vin = readFifo("board_vin")
 
-		if board_state == "OK":
-			for name in btn_state:
-				btn_state[name] = readFifo(name)
-		else:
-			for name in btn_state:
-				btn_state[name] = "-"
+		for name in roofstate:
+			roofstate[name] = readFifo(name)
 
 		StateUpdater()
 		time.sleep(0.1)
@@ -145,7 +135,7 @@ def updateStatus():
 #GUI updater
 def StateUpdater():
 
-	global last_btn_state
+	global last_roofstate
 	global last_board_state
 	global last_board_vin
 
@@ -157,78 +147,64 @@ def StateUpdater():
 			last_board_state = board_state
 			app.setLabel("l_BoardStatus", "Board " + board_state)
 			app.setBg("#500000")
-			for name in btn_state:
-				setButtonUnknown("btn_out"+name)
 
 	else:
 		if board_state != last_board_state:
 			last_board_state = board_state
 			app.setLabel("l_BoardStatus", "Board " + board_state)
 			app.setBg("#202020")
-			for name in btn_state:
-				last_btn_state[name] = not btn_state[name]
+	
 
-		for name in btn_state:
-			if btn_state[name] != last_btn_state[name]:
-				last_btn_state[name] = btn_state[name]
-				if btn_state[name] == "0":
-					setButtonOFF("btn_out"+name)
-				elif btn_state[name] == "1":
-					setButtonON("btn_out"+name)
-				else:
-					setButtonUnknown("btn_out"+name)
+	for name in roofstate:
+		if roofstate[name] != last_roofstate[name]:
+			last_roofstate[name] = roofstate[name]
+			app.setLabel(name, roofstate[name])
+			if name == "state":
+				roof_state = roofstate[name]
+				if roof_state == "OPENED":
+					app.setImage("state_img", "ressources/Opened.png")
+				if roof_state == "CLOSED":
+					app.setImage("state_img", "ressources/Closed.png")
+				if roof_state == "OPENING":
+					app.setImage("state_img", "ressources/Opening.png")
+				if roof_state == "CLOSING":
+					app.setImage("state_img", "ressources/Closing.png")
+				if roof_state == "ABORT":
+					app.setImage("state_img", "ressources/Idle.png")
+				if roof_state == "IDLE":
+					app.setImage("state_img", "ressources/Idle.png")
 
 
 # handle button events
 def press(button):
-	for name in btn_state:
-		if button == "btn_out"+name:
-			if btn_state[name] == "0":
-				writeFifo(name, "1")
-			elif btn_state[name] == "1":
-				writeFifo(name, "0")
-			else:
-				pass
+	
+	if button == "abort":
+		writeFifo("move", "ABORT")
+	
+	if button == "open":
+		writeFifo("move", "OPEN")
+
+	if button == "close":
+		writeFifo("move", "CLOSE")
 
 
 
 # create GUI
-app = gui("Power Board", "225x600", handleArgs=False)
+app = gui("Roof", "225x600", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
 app.setFont(24)
 
 
-
-app.addLabel("l_out1", "1: Roof", 1, 0)
-app.setLabelAlign("l_out1", "left")
-app.addButton("btn_out1", press, 1, 1)
-setButtonUnknown("btn_out1")
-
-app.addLabel("l_out2", "2: Mount", 2, 0)
-app.setLabelAlign("l_out2", "left")
-app.addButton("btn_out2", press, 2, 1)
-setButtonUnknown("btn_out2")
-
-app.addLabel("l_out3", "3: DSLR", 3, 0)
-app.setLabelAlign("l_out3", "left")
-app.addButton("btn_out3", press, 3, 1)
-setButtonUnknown("btn_out3")
-
-app.addLabel("l_out4", "4:", 4, 0)
-app.setLabelAlign("l_out4", "left")
-app.addButton("btn_out4", press, 4, 1)
-setButtonUnknown("btn_out4")
-
-app.addLabel("l_out5", "5: Flat", 5, 0)
-app.setLabelAlign("l_out5", "left")
-app.addButton("btn_out5", press, 5, 1)
-setButtonUnknown("btn_out5")
-
-app.addLabel("l_out6", "6: ", 6, 0)
-app.setLabelAlign("l_out6", "left")
-app.addButton("btn_out6", press, 6, 1)
-setButtonUnknown("btn_out6")
+app.addImage("state_img", "ressources/Idle.png", 1, 0)
+app.addLabel("state", " --- ", 1, 1)
+app.addLabel("l_opened", "O lock", 2, 0)
+app.addLabel("l_closed", "C lock", 2, 1)
+app.addLabel("opened", "-", 3, 0)
+app.addLabel("closed", "-", 3, 1)
+app.addButton("open", press, 5, 0)
+app.addButton("close", press, 5, 1)
+app.addButton("abort", press)
 
 
 app.addLabel("l_BoardStatus")
