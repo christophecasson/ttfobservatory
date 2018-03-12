@@ -51,9 +51,10 @@ bool RunScript(char* script, ...)
         }
         va_end(ap);
         char path[256];
-        snprintf(path, 256, "%s", tmp);
+        snprintf(path, 256, "%s/%s", "/home/astro/dev/ttfobservatory/tests", tmp);
 	printf("args[0]=%s\r\nargs[1]=%s\r\nargs[2]=%s\r\n", args[0], args[1], args[2]);
 
+	snprintf(args[0], 256, "%s", tmp);
 	printf("executing %s %s\r\n", path, args);
         execvp(path, args);
         printf("Failed to execute script\r\n");
@@ -76,7 +77,7 @@ int main()
     printf("START\r\n");
     char *name  = tmpnam(nullptr);
     printf("temp=%s\r\n", name);
-    char *scriptname = "/home/astro/dev/ttfobservatory/tests/status.py";
+    char *scriptname = "status.py";
     printf("scriptname=%s\r\n", scriptname);
 
     bool status = RunScript(scriptname, name, nullptr);

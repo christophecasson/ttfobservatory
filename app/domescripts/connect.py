@@ -11,7 +11,7 @@ from tools import *
 
 if readFifo(fifo_root_path+"powerboard/status/board_state") != "OK":
 	debug("Error connecting Dome scripting gateway")
-	sys.exit(1)
+#	sys.exit(1)
 
 debug("Powerboard state OK: Dome scripting gateway connected!")
 sys.exit(0)
