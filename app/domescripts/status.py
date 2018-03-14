@@ -14,35 +14,68 @@ script, path = sys.argv
 
 debug("status filepath=" + path)
 
-#if readFifo(fifo_root_path+"powerboard/status/board_state") != "OK":
-#	debug("powerboard controller Error")
-#	sys.exit(1)
+retry = 10
+while retry > 0: 
+    powerboard_state = readFifo(fifo_root_path+"powerboard/status/board_state")
+    if powerboard_state == "OK":
+        break
+    else:
+	debug("powerboard controller Error")
+        retry = retry-1
+        if retry == 0:
+            sys.exit(1)
 
-#roofboard_state = readFifo(fifo_root_path+"roof/status/board_state")
-#if roofboard_state == "OK":
-#	parked = "0"
-#elif roofboard_state == "Error":
-#	parked = "1"
-#else:
-#	debug("unable to get dome park state")
-#	sys.exit(1)
+retry = 10
+while retry > 0:
+    roofboard_state = readFifo(fifo_root_path+"roof/status/board_state")
+    if roofboard_state == "OK":
+	parked = "0"
+        break
+    elif roofboard_state == "Error":
+	parked = "1"
+        break
+    else:
+	debug("unable to get dome park state")
+        retry = retry-1
+        if retry == 0:
+	    sys.exit(1)
 
-#roofopened = readFifo(fifo_root_path+"roof/status/opened")
-#roofclosed = readFifo(fifo_root_path+"roof/status/closed")
-#if roofopened == "1":
-#	if roofclosed == "0":
-#		shutter = "1"
-#	else:
-#		shutter = "2"
-#if roofclosed == "1":
-#	if roofopened == "0":
-#		shutter = "0"
-#	else:
-#		shutter = "2"
+retry = 10
+while retry > 0:
+    roofopened = readFifo(fifo_root_path+"roof/status/opened")
+    if roofopened == "0" or roofopened == "1":
+        break
+    else:
+        debug("unable to get opened lock state")
+        retry = retry-1
+        if retry == 0:
+            sys.exit(1)
+    
+retry = 10
+while retry > 0:
+    roofclosed = readFifo(fifo_root_path+"roof/status/closed")
+    if roofclosed == "0" or roofclosed == "1":
+        break
+    else:
+        debug("unable to get closed lock state")
+        retry = retry-1
+        if retry == 0:
+            sys.exit(1)
 
-parked = "0"
-shutter = "0"
-
+    
+    
+    
+#   | opened | closed | shutter |  
+#   |   0    |   0    |   [0]   |  
+#   |   0    |   1    |    0    |  
+#   |   1    |   0    |    1    |  
+#   |   1    |   1    |   [0]   |  
+    
+if roofopened == "1" and roofclosed == "0":
+    shutter = "1"
+else:
+    shutter = "0"
+    
 
 debug("Status: [parked=" + parked + "] [shutter=" + shutter + "] [az=0.0]")
 status = open(path, 'w')
