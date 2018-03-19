@@ -190,10 +190,10 @@ def press(button):
 
 
 # create GUI
-app = gui("Roof", "225x600", handleArgs=False)
+app = gui("Roof", "240x600", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
-app.setFont(24)
+app.setFont(20)
 
 
 app.addImage("state_img", "ressources/Idle.png", 1, 0)
@@ -209,7 +209,7 @@ app.addButton("abort", press)
 
 app.addLabel("l_BoardStatus")
 app.addLabel("l_Vin")
-app.getLabelWidget("l_Vin").config(font="Courier 18")
+app.getLabelWidget("l_Vin").config(font="Courier 14")
 
 
 

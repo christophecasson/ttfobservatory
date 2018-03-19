@@ -196,7 +196,7 @@ def press(button):
 app = gui("Power Board", "225x600", handleArgs=False)
 app.setBg("#202020")
 app.setFg("red")
-app.setFont(24)
+app.setFont(20)
 
 
 
@@ -220,7 +220,7 @@ app.setLabelAlign("l_out4", "left")
 app.addButton("btn_out4", press, 4, 1)
 setButtonUnknown("btn_out4")
 
-app.addLabel("l_out5", "5: Flat", 5, 0)
+app.addLabel("l_out5", "5: ", 5, 0)
 app.setLabelAlign("l_out5", "left")
 app.addButton("btn_out5", press, 5, 1)
 setButtonUnknown("btn_out5")
@@ -233,7 +233,7 @@ setButtonUnknown("btn_out6")
 
 app.addLabel("l_BoardStatus")
 app.addLabel("l_Vin")
-app.getLabelWidget("l_Vin").config(font="Courier 18")
+app.getLabelWidget("l_Vin").config(font="Courier 14")
 
 
 
