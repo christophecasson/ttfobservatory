@@ -134,7 +134,7 @@ then
 	echo 0 > /home/astro/fifo/powerboard/control/3
 	sleep 1
 
-	exit 30
+	exit 31
 else
 	echo " [ OK ]"
 fi
@@ -151,7 +151,7 @@ then
 	echo 0 > /home/astro/fifo/powerboard/control/3
 	sleep 1
 
-	exit 30
+	exit 32
 else
 	echo " [ OK ]"
 fi
@@ -168,7 +168,7 @@ then
 	echo 0 > /home/astro/fifo/powerboard/control/3
 	sleep 1
 
-	exit 30
+	exit 33
 else
 	echo " [ OK ]"
 fi
@@ -185,7 +185,7 @@ then
 	echo 0 > /home/astro/fifo/powerboard/control/3
 	sleep 1
 
-	exit 30
+	exit 34
 else
 	echo " [ OK ]"
 fi
@@ -195,39 +195,224 @@ fi
 
 
 
-echo "Powering ON roof..."
-#connect
-#indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONNECTION.CONNECT=On"
-echo "Checking roof..."
+echo -n "Powering ON roof..."
+echo 1 > /home/astro/fifo/powerboard/control/1
+sleep 1
+echo 1 > /home/astro/fifo/powerboard/control/1
+sleep 1
+echo 1 > /home/astro/fifo/powerboard/control/1
+sleep 1
+if [[ $(cat $CNTRL_FIFO/powerboard/status/1) != "1" ]]
+then
+	echo " [ ERROR ]"
+	echo "   -> error powering ON Roof, ABORTING START"
+	killall indiserver
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/3
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/1
+	sleep 1
+	
+	exit 5
+else
+	echo " [ OK ]"	
+fi
+
+sleep 2
+
+echo -n "Connecting Device: Dome Scripting Gateway..."
+indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONNECTION.CONNECT=On"
+sleep 1
+if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.CONNECTION.CONNECT") != "On" ]]
+then
+	echo " [ ERROR ]"
+	echo "   -> error Connecting device, ABORTING START"
+	killall indiserver
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/3
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/1
+	sleep 1
+
+	exit 35
+else
+	echo " [ OK ]"
+fi
+
+sleep 1
+
+echo -n "Checking roof..."
 #roof must be PARKED and CLOSED
+if [[ $(cat $CNTRL_FIFO/roof/status/state) = "CLOSED" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.PARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_CLOSE") = "On" ]]
+then
+	echo " [ OK ]"	
+else
+	echo " [ ERROR ]"
+	echo "   -> Roof is not CLOSED, ABORTING START"
+	killall indiserver
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/3
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/1
+	sleep 1
+	
+	exit 50
+fi
 
-echo "Powering Telescope Mount..."
-#connect
-#indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.CONNECT=On"
-echo "Checking Telescope Mount..."
+
+
+
+
+
+
+
+
+echo -n "Powering Telescope Mount..."
+echo 1 > /home/astro/fifo/powerboard/control/2
+sleep 1
+echo 1 > /home/astro/fifo/powerboard/control/2
+sleep 1
+echo 1 > /home/astro/fifo/powerboard/control/2
+sleep 1
+if [[ $(cat $CNTRL_FIFO/powerboard/status/2) != "1" ]]
+then
+	echo " [ ERROR ]"
+	echo "   -> error powering ON Telescope Mount, ABORTING START"
+	killall indiserver
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/3
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/1
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/2
+	sleep 1
+	
+	exit 6
+else
+	echo " [ OK ]"	
+fi
+
+sleep 2
+
+echo -n "Connecting Device: EQMod Mount..."
+indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.CONNECT=On"
+sleep 1
+if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.CONNECTION.CONNECT") != "On" ]]
+then
+	echo " [ ERROR ]"
+	echo "   -> error Connecting device, ABORTING START"
+	killall indiserver
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/3
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/1
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/2
+	sleep 1
+
+	exit 36
+else
+	echo " [ OK ]"
+fi
+
+sleep 1
+
+echo -n "Checking Telescope Mount..."
 #mount must be PARKED (if not parked after power-on, mount may be in dangerous position -> shutdown and warn)
+if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") = "On" ]]
+then
+	echo " [ OK ]"
+else
+	echo " [ ERROR ]"
+	echo "   -> Telescope mount is not PARKED after power on [ it may be in UNKNOWN POSITION ], ABORTING START"
+	killall indiserver
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/3
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/1
+	sleep 1
+	echo 0 > /home/astro/fifo/powerboard/control/2
+	sleep 1
+	
+	exit 60
+fi
 
-echo "Opening roof..."
 
-echo "Slew mount to HOME..."
+
+
+
+
+sleep 3
+
+echo -n "Opening roof..."
+indi_setprop -p $INDI_PORT "Dome Scripting Gateway.DOME_PARK.UNPARK=On"
+sleep 1
+declare -i timeout=120
+while [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]]
+do
+	sleep 1
+	timeout=$timeout-1
+	if [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENING" ]]
+	then
+		echo "OPEN" > $CNTRL_FIFO/roof/control/move
+	fi
+	if [[ $timeout = 0 ]]
+	then
+		echo " [ ERROR ]"
+		echo "   -> Roof opening Timeout, ABORTING START"
+
+		echo "Shutdown observatory!"
+		#launch shutdown script		
+
+		exit 80
+	fi
+done
+echo " [ OK ]"
+
+sleep 3
+
+
+echo -n "Unparking Telescope Mount..."
+if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.PARK") = "Off" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_CLOSE") = "Off" ]]
+then
+	echo -n "Roof is Opened, Unparking Mount..."
+	indi_setprop -p $INDI_PORT "EQMod Mount.TELESCOPE_PARK.UNPARK=On"
+	sleep 1
+	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.UNPARK") = "On" ]]
+	then
+		echo " [ OK ]"
+	else
+		echo " [ Error ]"
+		echo "   -> Failed to unpark mount, ABORTING START"
+		
+		echo "Shutdown observatory!"
+		#launch shutdown script		
+
+		exit 82
+	fi
+else
+	echo " [ Error ]"
+	echo "   -> Failed to open roof, ABORTING START"
+
+	echo "Shutdown observatory!"
+	#launch shutdown script		
+
+		exit 81
+fi
+
+
+
+echo -n "Slew mount to HOME..."
+
+
+
+
+
 
 
 
 
 echo "Observatory ready!"
-
-sleep 20
-
-echo "shutting down..."
-#park mount
-#close roof
-killall indiserver
-echo 0 > /home/astro/fifo/powerboard/control/1
-echo 0 > /home/astro/fifo/powerboard/control/2
-echo 0 > /home/astro/fifo/powerboard/control/3
-echo 0 > /home/astro/fifo/powerboard/control/4
-echo 0 > /home/astro/fifo/powerboard/control/5
-echo 0 > /home/astro/fifo/powerboard/control/6
 
 echo "### START END ###"
 exit 0
