@@ -27,13 +27,19 @@ while retry > 0:
 
 retry = 10
 while retry > 0:
-    roofboard_state = readFifo(fifo_root_path+"roof/status/board_state")
-    if roofboard_state == "OK":
-	parked = "0"
-        break
-    elif roofboard_state == "Error":
+    roofboard_state = readFifo(fifo_root_path+"roof/status/state")
+    if roofboard_state == "CLOSED":
 	parked = "1"
         break
+    elif roofboard_state == "OPENED":
+	parked = "0"
+        break
+    elif roofboard_state == "CLOSING":
+	parked = "0"
+	break
+    elif roofboard_state == "OPENING":
+	parked = "1"
+	break
     else:
 	debug("unable to get dome park state")
         retry = retry-1

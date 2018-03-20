@@ -12,9 +12,9 @@ from tools import *
 
 debug("Open")
 
-if readFifo(fifo_root_path+"roof/status/board_state") != "OK":
-	debug("Roof controller Error")
-	sys.exit(1)
+#if readFifo(fifo_root_path+"roof/status/board_state") != "OK":
+#	debug("Roof controller Error")
+#	sys.exit(1)
 
 retry = 5
 while readFifo(fifo_root_path+"roof/status/state") != "OPENING":
