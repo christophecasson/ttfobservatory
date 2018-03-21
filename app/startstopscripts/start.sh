@@ -348,7 +348,7 @@ echo -n "Opening roof..."
 indi_setprop -p $INDI_PORT "Dome Scripting Gateway.DOME_PARK.UNPARK=On"
 sleep 1
 declare -i timeout=120
-while [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]]
+while [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "Off" ]] || [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENED" ]] 
 do
 	sleep 1
 	timeout=$timeout-1
