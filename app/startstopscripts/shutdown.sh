@@ -22,12 +22,13 @@ else
 fi
 
 echo -n "Starting temporary indiserver..."
-indiserver -p $INDI_PORT -l /home/astro/indilog -v indi_eqmod_telescope
+indiserver -p $INDI_PORT -l /home/astro/indilog indi_eqmod_telescope &
 sleep 3
 echo " [ OK ]"
 
 echo -n "Loading indi EQMod Mount parameters..."
 indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
+sleep 3
 echo " [ OK ]"
 
 echo -n "Checking Telescope Mount"
@@ -60,7 +61,7 @@ then #if mount is OFF
 		echo " [ OK ]"
 	fi
 	echo -n "   -> Telescope Mount Park state:"
-	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") = "On" ]]
+	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.UNPARK") = "Off" ]]
 	then
 		echo " [ PARKED ]"	
 	else
@@ -84,7 +85,7 @@ else #if mount is ON
 		echo " [ OK ]"
 	fi
 	echo -n "   -> Telescope Mount Park state:"
-	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") = "On" ]]
+	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.UNPARK") = "Off" ]]
 	then
 		echo " [ PARKED ]"	
 	else
