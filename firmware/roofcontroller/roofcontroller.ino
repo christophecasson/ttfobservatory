@@ -7,7 +7,7 @@
 
 
 #define pin_inputvoltage  A0
-#define INV_COEF          51.7
+#define INV_COEF          35.0
 
 #define pin_button_open  10
 #define pin_button_close  11
@@ -67,6 +67,8 @@ void setup() {
   pinMode(pin_relay_enable, OUTPUT);
   pinMode(pin_relay_direction, OUTPUT);
 
+  analogReference(EXTERNAL);
+
 
   digitalWrite(pin_relay_enable, LOW);
   digitalWrite(pin_relay_direction, LOW);
@@ -115,7 +117,7 @@ void loop() {
     ledblink_interval = 250;
     board_status = false;
   }
-  else if(inputvoltage > 13500)
+  else if(inputvoltage > 14000)
   {
     state = STATE_IDLE;
     ledblink_interval = 100;
@@ -513,7 +515,7 @@ void printVoltageStatus()
       {
         Serial.print("[ERROR] IN Voltage too low (");
       }
-      else if(inputvoltage > 13500)
+      else if(inputvoltage > 14000)
       {
         Serial.print("[ERROR] IN Voltage too high (");
       }
