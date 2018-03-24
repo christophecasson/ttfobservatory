@@ -185,7 +185,7 @@ fi
 
 echo "Checking Weather conditions..."
 indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
-sleep 3
+sleep 6
 weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
 weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
 weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
@@ -242,7 +242,7 @@ echo -n "Unparking Telescope Mount..."
 #if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]] && 
 if [[ $(cat $CNTRL_FIFO/roof/status/state) = "OPENED" ]]
 then
-	echo -n "Roof is Opened, Unparking Mount..."
+	echo "Roof is Opened, Unparking Mount..."
 	indi_setprop -p $INDI_PORT "EQMod Mount.TELESCOPE_PARK.UNPARK=On"
 	sleep 3
 	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.UNPARK") = "On" ]]
@@ -270,7 +270,14 @@ fi
 
 
 echo -n "Slew mount to HOME..."
+targetRA=8
+targetDEC=90
 
+indi_setprop -p $INDI_PORT "EQMod Mount.ON_COORD_SET.SLEW=On"
+indi_setprop -p $INDI_PORT "EQMod Mount.EQUATORIAL_EOD_COORD.RA;DEC=$targetRA;$targetDEC"
+indi_eval -t 60 -p $INDI_PORT -wo 'abs("EQMod Mount.EQUATORIAL_EOD_COORD.RA"-'$targetRA')<0.05 && abs("EQMod Mount.EQUATORIAL_EOD_COORD.DEC"-'$targetDEC')<0.05'
+echo " [ OK ]"
+sleep 1
 
 
 

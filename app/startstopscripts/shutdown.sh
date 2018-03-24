@@ -103,18 +103,9 @@ else
 	echo -n "Park Telescope Mount..."
 	indi_setprop -p $INDI_PORT "EQMod Mount.TELESCOPE_PARK.PARK=On"
 	sleep 1
-	declare -i timeout=120
-	while [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") != "On" ]]
-	do
-		sleep 1
-		timeout=$timeout-1
-		if [[ timeout = 0 ]]
-		then
-			echo " [ Error ]"
-			echo "      -> Error parking EQMod Mount, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
-			exit 6
-		fi
-	done
+	parkRA=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK_POSITION.PARK_RA"`
+	parkDEC=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK_POSITION.PARK_DEC"`
+	indi_eval -t 120 -p $INDI_PORT -wo '"EQMod Mount.CURRENTSTEPPERS.RAStepsCurrent"=='$parkRA' && "EQMod Mount.CURRENTSTEPPERS.DEStepsCurrent"=='$parkDEC
 	echo " [ OK ]"
 fi
 
