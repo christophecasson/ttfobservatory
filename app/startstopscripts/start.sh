@@ -7,7 +7,6 @@ CNTRL_FIFO="/home/astro/fifo"
 echo "### START BEGIN ###"
 
 
-
 echo -n "Checking indiserver status..."
 if [[ $(indi_getprop -p $INDI_PORT > /dev/null 2>&1; echo $?) != 0 ]]  #if indiserver not running on $INDI_PORT 
 then
@@ -18,8 +17,6 @@ else
 	echo "[ OK ]"
 fi
 
-
-
 echo -n "Checking power board status..."
 if [[ $(cat $CNTRL_FIFO/powerboard/status/board_state) != "OK" ]]
 then
@@ -29,7 +26,6 @@ then
 else
 	echo " [ OK ]"
 fi
-
 
 echo -n "Powering ON DSLR..."
 echo 1 > /home/astro/fifo/powerboard/control/3
@@ -185,6 +181,33 @@ fi
 
 
 
+#TODO check weather here
+
+echo "Checking Weather conditions..."
+indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+sleep 3
+weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
+weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
+weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
+weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
+
+echo "   -> WEATHER_FORECAST=$weather_forecast"
+echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
+echo "   -> WEATHER_WIND_SPEED=$weather_windspeed"
+echo "   -> WEATHER_RAIN_HOUR=$weather_rainhour"
+
+if [[ $weather_forecast = "Ok" ]] && [[ $weather_temperature = "Ok" ]] && [[ $weather_windspeed = "Ok" ]] && [[ $weather_rainhour = "Ok" ]]
+then
+	echo "   -> Current weather conditions are OK"
+else
+	echo "   -> Current weather conditions are unsafe, ABORTING START"
+	echo "Shutdown observatory!"
+	#launch shutdown script		
+	./shutdown.sh
+	exit 70
+fi
+
+sleep 2
 
 echo -n "Opening roof..."
 indi_setprop -p $INDI_PORT "Dome Scripting Gateway.DOME_PARK.UNPARK=On"
