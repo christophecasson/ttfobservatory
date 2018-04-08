@@ -215,7 +215,7 @@ app.setLabelAlign("l_out3", "left")
 app.addButton("btn_out3", press, 3, 1)
 setButtonUnknown("btn_out3")
 
-app.addLabel("l_out4", "4:", 4, 0)
+app.addLabel("l_out4", "4: Focus", 4, 0)
 app.setLabelAlign("l_out4", "left")
 app.addButton("btn_out4", press, 4, 1)
 setButtonUnknown("btn_out4")
