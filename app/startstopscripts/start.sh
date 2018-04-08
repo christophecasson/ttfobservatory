@@ -185,6 +185,10 @@ fi
 
 echo "Checking Weather conditions..."
 indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+sleep 2
+indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+sleep 2
+indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
 sleep 6
 weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
 weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
@@ -201,9 +205,9 @@ then
 	echo "   -> Current weather conditions are OK"
 else
 	echo "   -> Current weather conditions are unsafe, ABORTING START"
-	echo "Shutdown observatory!"
-	#launch shutdown script		
-	./shutdown.sh
+#	echo "Shutdown observatory!"
+#	#launch shutdown script		
+#	./shutdown.sh
 	exit 70
 fi
 
@@ -269,15 +273,15 @@ fi
 
 
 
-echo -n "Slew mount to HOME..."
-targetRA=8
-targetDEC=90
+#echo -n "Slew mount to HOME..."
+#targetRA=15.44
+#targetDEC=77.47
 
-indi_setprop -p $INDI_PORT "EQMod Mount.ON_COORD_SET.SLEW=On"
-indi_setprop -p $INDI_PORT "EQMod Mount.EQUATORIAL_EOD_COORD.RA;DEC=$targetRA;$targetDEC"
-indi_eval -t 60 -p $INDI_PORT -wo 'abs("EQMod Mount.EQUATORIAL_EOD_COORD.RA"-'$targetRA')<0.05 && abs("EQMod Mount.EQUATORIAL_EOD_COORD.DEC"-'$targetDEC')<0.05'
-echo " [ OK ]"
-sleep 1
+#indi_setprop -p $INDI_PORT "EQMod Mount.ON_COORD_SET.SLEW=On"
+#indi_setprop -p $INDI_PORT "EQMod Mount.EQUATORIAL_EOD_COORD.RA;DEC=$targetRA;$targetDEC"
+#indi_eval -t 60 -p $INDI_PORT -wo 'abs("EQMod Mount.EQUATORIAL_EOD_COORD.RA"-'$targetRA')<0.05 && abs("EQMod Mount.EQUATORIAL_EOD_COORD.DEC"-'$targetDEC')<0.05'
+#echo " [ OK ]"
+#sleep 1
 
 
 
