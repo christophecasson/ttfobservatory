@@ -27,6 +27,18 @@ else
 	echo " [ OK ]"
 fi
 
+echo -n "Powering ON Focuser..."
+echo 1 > /home/astro/fifo/powerboard/control/4
+sleep 1
+if [[ $(cat $CNTRL_FIFO/powerboard/status/4) != "1" ]]
+then
+	echo " [ ERROR ]"
+	echo "   -> error powering ON DSLR, ABORTING START"
+	exit 3
+else
+	echo " [ OK ]"	
+fi
+
 echo -n "Powering ON DSLR..."
 echo 1 > /home/astro/fifo/powerboard/control/3
 sleep 1
@@ -34,7 +46,7 @@ if [[ $(cat $CNTRL_FIFO/powerboard/status/3) != "1" ]]
 then
 	echo " [ ERROR ]"
 	echo "   -> error powering ON DSLR, ABORTING START"
-	exit 3
+	exit 4
 else
 	echo " [ OK ]"	
 fi
@@ -46,7 +58,7 @@ if [[ $(cat $CNTRL_FIFO/powerboard/status/2) != "1" ]]
 then
 	echo " [ ERROR ]"
 	echo "   -> error powering ON Mount, ABORTING START"
-	exit 4
+	exit 5
 else
 	echo " [ OK ]"	
 fi
@@ -58,7 +70,7 @@ if [[ $(cat $CNTRL_FIFO/powerboard/status/1) != "1" ]]
 then
 	echo " [ ERROR ]"
 	echo "   -> error powering ON Roof, ABORTING START"
-	exit 5
+	exit 6
 else
 	echo " [ OK ]"	
 fi
@@ -181,7 +193,6 @@ fi
 
 
 
-#TODO check weather here
 
 echo "Checking Weather conditions..."
 indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
