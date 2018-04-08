@@ -1,0 +1,12 @@
+use modified Focuserv172_DRV8825_HW203.ino firmware
+
+configure it with windows app:
+CoilPwr disabled
+1/2 step
+
+
+
+Reduction ratio: 3.75 (16t to 60t)
+mak127 focuser range: 30 rotation
+22500 full step
+45000 half step
