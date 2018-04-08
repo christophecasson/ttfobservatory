@@ -33,7 +33,7 @@ sleep 1
 if [[ $(cat $CNTRL_FIFO/powerboard/status/4) != "1" ]]
 then
 	echo " [ ERROR ]"
-	echo "   -> error powering ON DSLR, ABORTING START"
+	echo "   -> error powering ON Focuser, ABORTING START"
 	exit 3
 else
 	echo " [ OK ]"	
