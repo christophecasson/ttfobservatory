@@ -69,10 +69,10 @@
 //#define LCDDISPLAY 1
 
 // To enable the buzzer, uncomment the next line
-#define BUZZER 1
+//#define BUZZER 1
 
 // To enable the IN-OUT LEDS, uncomment the next line
-#define INOUTLEDS 1
+//#define INOUTLEDS 1
 
 // do not change
 //#define DEBUG
@@ -387,12 +387,12 @@ struct config_t {
 #define gledOUT           A2
 #define Buzzer            A3
 #define ch1temp           2
-#define myDir             3
-#define myStep            4
-#define myEnable          8
-#define myM2              5         // microstepping lines
-#define myM1              6         // M0/M1/M2 sets stepping mode 000=F, 100=1/2, 010=1/4, 110=1/8, 001=1/16, 101=1/16, 110=1/16 etc
-#define myM0              7         // steps per revolution = 200, 400, 800, 1600, 6400
+#define myDir             12
+#define myStep            11
+#define myEnable          5
+#define myM2              8         // microstepping lines
+#define myM1              7         // M0/M1/M2 sets stepping mode 000=F, 100=1/2, 010=1/4, 110=1/8, 001=1/16, 101=1/16, 110=1/16 etc
+#define myM0              6         // steps per revolution = 200, 400, 800, 1600, 6400
 #define EEPROMSIZE        1024      // ATMEGA328P 1024 EEPROM
 #define TIMEINTERVAL      10000L
 #define OUTPUTENABLED     1
@@ -695,11 +695,11 @@ void setstepmode()
 void ResetFocuserDefaults()
 {
   myfocuser.validdata = 99;
-  myfocuser.fposition = 5000L;
-  myfocuser.maxstep = 10000L;
-  myfocuser.stepmode = 1;
+  myfocuser.fposition = 25000L;
+  myfocuser.maxstep = 50000L;
+  myfocuser.stepmode = 8;
   myfocuser.ReverseDirection = false;
-  myfocuser.coilPwr = true;
+  myfocuser.coilPwr = false;
   myfocuser.tempmode = true; // celsius
   myfocuser.updatedisplayintervalNotMoving = 2500L;
   myfocuser.ds18b20resolution = TEMP_PRECISION;
@@ -1735,6 +1735,12 @@ void setup()
   updatecount = 0;
 #endif
 
+//sleep and reset pin
+  pinMode(  9, OUTPUT );
+  pinMode(  10, OUTPUT );
+  digitalWrite( 9, 1 );
+  digitalWrite( 10, 1 );
+
   pinMode(  myDir, OUTPUT );
   pinMode(  myStep, OUTPUT );
   pinMode(  myM0, OUTPUT );
@@ -1865,6 +1871,7 @@ void loop()
     // Going Anticlockwise to lower position
     if (targetPosition < currentPosition)
     {
+      enableoutput();
       anticlockwise();
       currentPosition--;
     }
@@ -1873,6 +1880,7 @@ void loop()
     if (targetPosition > currentPosition)
     {
       // do not need to check if > maximumPosition as its done when a target command is receieved
+      enableoutput();
       clockwise();
       currentPosition++;
     }
@@ -1955,7 +1963,20 @@ void loop()
         writenow = false;
       }
     }
+    
+    clearOutput(); // release the stepper coils to save power
+    
   }  // end of else
+}
+
+// disable the stepper motor outputs
+void clearOutput()
+{
+  // check to see what is selected, keep or release
+  if ( !myfocuser.coilPwr )
+  {
+    disableoutput();
+  }
 }
 
 void clearSerialPort()
