@@ -5,7 +5,7 @@ CNTRL_FIFO="/home/astro/fifo"
 
 
 echo "### START BEGIN ###"
-
+/home/astro/notificationtoIFTTT.sh 'Observatory startup begin'
 
 echo -n "Checking indiserver status..."
 if [[ $(indi_getprop -p $INDI_PORT > /dev/null 2>&1; echo $?) != 0 ]]  #if indiserver not running on $INDI_PORT 
@@ -302,6 +302,8 @@ fi
 
 
 echo "Observatory ready!"
+
+/home/astro/notificationtoIFTTT.sh 'Observatory ready!'
 
 echo "### START END ###"
 exit 0

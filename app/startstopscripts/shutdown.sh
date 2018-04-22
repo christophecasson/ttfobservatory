@@ -6,6 +6,8 @@ CNTRL_FIFO="/home/astro/fifo"
 
 echo "### SHUTDOWN BEGIN ###"
 
+/home/astro/notificationtoIFTTT.sh 'Observatory shutdown started'
+
 echo -n "Checking powerboard status..."
 if [[ $(cat $CNTRL_FIFO/powerboard/status/board_state) = "OK" ]]
 then
@@ -265,6 +267,8 @@ echo " [ OK ]"
 
 
 echo "Observatory closed and shutdown!" 
+/home/astro/notificationtoIFTTT.sh 'Observatory closed and shutdown!'
 
 echo "### SHUTDOWN END ###"
+
 exit 0
