@@ -5,6 +5,22 @@ CNTRL_FIFO="/home/astro/fifo"
 
 declare -i timeout=0
 
+openRoof=false
+unparkMount=false
+
+#handling of options
+while [ "${1:-}" != "" ]; do
+    case "$1" in
+      "-o" | "--open")
+        openRoof=true
+        ;;
+      "-u" | "--unpark")
+        unparkMount=true
+        ;;
+    esac
+    shift
+  done
+
 echo "### START BEGIN ###"
 
 /home/astro/notificationtoIFTTT.sh 'Observatory startup begin' > /dev/null 2>&1
@@ -311,67 +327,72 @@ fi
 
 sleep 2
 
-echo -n "Opening roof..."
-indi_setprop -p $INDI_PORT "Dome Scripting Gateway.DOME_PARK.UNPARK=On"
-sleep 1
-declare -i timeout=120
-#while [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.PARK") = "On" ]] ||
-while [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENED" ]]
-do
-	sleep 1
-	timeout=$timeout-1
-	if [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENING" ]]
-	then
-		echo "OPEN" > $CNTRL_FIFO/roof/control/move
-	fi
-	if [[ $timeout = 0 ]]
-	then
-		echo " [ ERROR ]"
-		echo "   -> Roof opening Timeout, ABORTING START"
-
-		echo "Shutdown observatory!"
-		#launch shutdown script
-		./shutdown.sh
-		exit 80
-	fi
-done
-echo " [ OK ]"
-
-sleep 3
-
-
-echo -n "Unparking Telescope Mount..."
-#if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]] &&
-if [[ $(cat $CNTRL_FIFO/roof/status/state) = "OPENED" ]]
-then
-	echo "Roof is Opened, Unparking Mount..."
-	indi_setprop -p $INDI_PORT "EQMod Mount.TELESCOPE_PARK.UNPARK=On"
-	sleep 1
-    timeout=60
-	while [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.UNPARK") != "On" ]]
+if [ $openRoof == true ]
+    then
+    echo -n "Opening roof..."
+    indi_setprop -p $INDI_PORT "Dome Scripting Gateway.DOME_PARK.UNPARK=On"
+    sleep 1
+    declare -i timeout=120
+    #while [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.PARK") = "On" ]] ||
+    while [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENED" ]]
     do
-        sleep 1
-        timeout=$timeout-1
-        if [[ $timeout = 0 ]]
+	    sleep 1
+	    timeout=$timeout-1
+	    if [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENING" ]]
 	    then
-            echo " [ Error ]"
-		    echo "   -> Failed to unpark mount, ABORTING START"
+		    echo "OPEN" > $CNTRL_FIFO/roof/control/move
+	    fi
+	    if [[ $timeout = 0 ]]
+	    then
+		    echo " [ ERROR ]"
+		    echo "   -> Roof opening Timeout, ABORTING START"
+
 		    echo "Shutdown observatory!"
 		    #launch shutdown script
 		    ./shutdown.sh
-		    exit 82
-        fi
+		    exit 80
+	    fi
     done
     echo " [ OK ]"
+    sleep 3
 
-else
-	echo " [ Error ]"
-	echo "   -> Failed to open roof, ABORTING START"
+    if [ $unparkMount == true ]
+    then
+        echo -n "Unparking Telescope Mount..."
+        #if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]] &&
+        if [[ $(cat $CNTRL_FIFO/roof/status/state) = "OPENED" ]]
+        then
+	        echo "Roof is Opened, Unparking Mount..."
+	        indi_setprop -p $INDI_PORT "EQMod Mount.TELESCOPE_PARK.UNPARK=On"
+	        sleep 1
+            timeout=60
+	        while [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.UNPARK") != "On" ]]
+            do
+                sleep 1
+                timeout=$timeout-1
+                if [[ $timeout = 0 ]]
+	            then
+                    echo " [ Error ]"
+		            echo "   -> Failed to unpark mount, ABORTING START"
+		            echo "Shutdown observatory!"
+		            #launch shutdown script
+		            ./shutdown.sh
+		            exit 82
+                fi
+            done
+            echo " [ OK ]"
 
-	echo "Shutdown observatory!"
-	#launch shutdown script
-	./shutdown.sh
-	exit 81
+        else
+	        echo " [ Error ]"
+	        echo "   -> Failed to open roof, ABORTING START"
+
+	        echo "Shutdown observatory!"
+	        #launch shutdown script
+	        ./shutdown.sh
+	        exit 81
+        fi
+
+    fi
 fi
 
 
