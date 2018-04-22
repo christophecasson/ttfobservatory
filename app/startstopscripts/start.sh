@@ -3,12 +3,14 @@
 INDI_PORT=7500
 CNTRL_FIFO="/home/astro/fifo"
 
+declare -i timeout=0
 
 echo "### START BEGIN ###"
-/home/astro/notificationtoIFTTT.sh 'Observatory startup begin'
+
+/home/astro/notificationtoIFTTT.sh 'Observatory startup begin' > /dev/null 2>&1
 
 echo -n "Checking indiserver status..."
-if [[ $(indi_getprop -p $INDI_PORT > /dev/null 2>&1; echo $?) != 0 ]]  #if indiserver not running on $INDI_PORT 
+if [[ $(indi_getprop -p $INDI_PORT > /dev/null 2>&1; echo $?) != 0 ]]  #if indiserver not running on $INDI_PORT
 then
 	echo " [ ERROR ]"
 	echo "   -> INDI server not running on port $INDI_PORT, ABORTING START!"
@@ -17,70 +19,91 @@ else
 	echo "[ OK ]"
 fi
 
+
 echo -n "Checking power board status..."
-if [[ $(cat $CNTRL_FIFO/powerboard/status/board_state) != "OK" ]]
-then
-	echo " [ ERROR ]"
-	echo "   -> Powerboard state Error, ABORTING START!"
-	exit 2
-else
-	echo " [ OK ]"
-fi
+timeout=60
+while [[ $(cat $CNTRL_FIFO/powerboard/status/board_state) != "OK" ]]
+do
+    echo -n "+"
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+	    echo " [ Error ]"
+	    echo "   -> Powerboard error, ABORTING START!"
+	    exit 2
+    fi
+done
+echo " [ OK ]"
+
+
 
 echo -n "Powering ON Focuser..."
-echo 1 > /home/astro/fifo/powerboard/control/4
-sleep 1
-if [[ $(cat $CNTRL_FIFO/powerboard/status/4) != "1" ]]
-then
-	echo " [ ERROR ]"
-	echo "   -> error powering ON Focuser, ABORTING START"
-	exit 3
-else
-	echo " [ OK ]"	
-fi
+timeout=60
+while [[ $(cat $CNTRL_FIFO/powerboard/status/4) != "1" ]]
+do
+    echo 1 > /home/astro/fifo/powerboard/control/4
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> error powering ON Focuser, ABORTING START"
+	    exit 3
+    fi
+done
+echo " [ OK ]"
 
 echo -n "Powering ON DSLR..."
-echo 1 > /home/astro/fifo/powerboard/control/3
-sleep 1
-if [[ $(cat $CNTRL_FIFO/powerboard/status/3) != "1" ]]
-then
-	echo " [ ERROR ]"
-	echo "   -> error powering ON DSLR, ABORTING START"
-	exit 4
-else
-	echo " [ OK ]"	
-fi
+timeout=60
+while [[ $(cat $CNTRL_FIFO/powerboard/status/3) != "1" ]]
+do
+    echo 1 > /home/astro/fifo/powerboard/control/3
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> error powering ON DSLR, ABORTING START"
+	    exit 4
+    fi
+done
+echo " [ OK ]"
 
 echo -n "Powering ON Mount..."
-echo 1 > /home/astro/fifo/powerboard/control/2
-sleep 1
-if [[ $(cat $CNTRL_FIFO/powerboard/status/2) != "1" ]]
-then
-	echo " [ ERROR ]"
-	echo "   -> error powering ON Mount, ABORTING START"
-	exit 5
-else
-	echo " [ OK ]"	
-fi
+timeout=60
+while [[ $(cat $CNTRL_FIFO/powerboard/status/2) != "1" ]]
+do
+    echo 1 > /home/astro/fifo/powerboard/control/2
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> error powering ON Mount, ABORTING START"
+	    exit 5
+    fi
+done
+echo " [ OK ]"
 
 echo -n "Powering ON Roof..."
-echo 1 > /home/astro/fifo/powerboard/control/1
-sleep 1
-if [[ $(cat $CNTRL_FIFO/powerboard/status/1) != "1" ]]
-then
-	echo " [ ERROR ]"
-	echo "   -> error powering ON Roof, ABORTING START"
-	exit 6
-else
-	echo " [ OK ]"	
-fi
-
+timeout=60
+while [[ $(cat $CNTRL_FIFO/powerboard/status/1) != "1" ]]
+do
+    echo 1 > /home/astro/fifo/powerboard/control/1
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> error powering ON Roof, ABORTING START"
+	    exit 6
+    fi
+done
+echo " [ OK ]"
 
 
 sleep 2
-
-
-
 
 echo -n "Loading indi devices parameters..."
 indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONFIG_PROCESS.CONFIG_LOAD=On"
@@ -103,7 +126,7 @@ echo " [ OK ]"
 
 echo -n "Connecting EQMod Mount..."
 while [[ $(indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
-do 
+do
 	sleep 1
 done
 echo " [ OK ]"
@@ -196,15 +219,79 @@ fi
 
 echo "Checking Weather conditions..."
 indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
-sleep 2
-indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
-sleep 2
-indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
-sleep 6
+sleep 1
 weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
 weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
 weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
 weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
+
+timeout=60
+while [[ $weather_forecast =~ ^(Idle|Busy)$ ]]
+do
+    #echo -n "+"
+    echo "   -> WEATHER_FORECAST=$weather_forecast"
+    indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+    sleep 1
+    weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> Error while retrieving weather_forecast data, ABORTING START"
+	    exit 71
+    fi
+done
+
+timeout=60
+while [[ $weather_temperature =~ ^(Idle|Busy)$ ]]
+do
+    #echo -n "*"
+    echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
+    indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+    sleep 1
+    weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> Error while retrieving weather_temperature data, ABORTING START"
+	    exit 72
+    fi
+done
+
+timeout=60
+while [[ $weather_windspeed =~ ^(Idle|Busy)$ ]]
+do
+    #echo -n "."
+    echo "   -> WEATHER_WIND_SPEED=$weather_windspeed"
+    indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+    sleep 1
+    weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> Error while retrieving weather_windspeed data, ABORTING START"
+	    exit 73
+    fi
+done
+
+timeout=60
+while [[ $weather_rainhour =~ ^(Idle|Busy)$ ]]
+do
+    #echo -n "-"
+    echo "   -> WEATHER_RAIN_HOUR=$weather_rainhour"
+    indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+    sleep 1
+    weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> Error while retrieving weather_rainhour data, ABORTING START"
+	    exit 74
+    fi
+done
 
 echo "   -> WEATHER_FORECAST=$weather_forecast"
 echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
@@ -216,9 +303,9 @@ then
 	echo "   -> Current weather conditions are OK"
 else
 	echo "   -> Current weather conditions are unsafe, ABORTING START"
-#	echo "Shutdown observatory!"
-#	#launch shutdown script		
-#	./shutdown.sh
+	echo "Shutdown observatory!"
+	#launch shutdown script
+	./shutdown.sh
 	exit 70
 fi
 
@@ -229,21 +316,21 @@ indi_setprop -p $INDI_PORT "Dome Scripting Gateway.DOME_PARK.UNPARK=On"
 sleep 1
 declare -i timeout=120
 #while [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.PARK") = "On" ]] ||
-while [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENED" ]] 
+while [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENED" ]]
 do
 	sleep 1
 	timeout=$timeout-1
-#	if [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENING" ]]
-#	then
-#		echo "OPEN" > $CNTRL_FIFO/roof/control/move
-#	fi
+	if [[ $(cat $CNTRL_FIFO/roof/status/state) != "OPENING" ]]
+	then
+		echo "OPEN" > $CNTRL_FIFO/roof/control/move
+	fi
 	if [[ $timeout = 0 ]]
 	then
 		echo " [ ERROR ]"
 		echo "   -> Roof opening Timeout, ABORTING START"
 
 		echo "Shutdown observatory!"
-		#launch shutdown script		
+		#launch shutdown script
 		./shutdown.sh
 		exit 80
 	fi
@@ -254,56 +341,43 @@ sleep 3
 
 
 echo -n "Unparking Telescope Mount..."
-#if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]] && 
+#if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]] &&
 if [[ $(cat $CNTRL_FIFO/roof/status/state) = "OPENED" ]]
 then
 	echo "Roof is Opened, Unparking Mount..."
 	indi_setprop -p $INDI_PORT "EQMod Mount.TELESCOPE_PARK.UNPARK=On"
-	sleep 3
-	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.UNPARK") = "On" ]]
-	then
-		echo " [ OK ]"
-	else
-		echo " [ Error ]"
-		echo "   -> Failed to unpark mount, ABORTING START"
-		
-		echo "Shutdown observatory!"
-		#launch shutdown script		
-		./shutdown.sh
-		exit 82
-	fi
+	sleep 1
+    timeout=60
+	while [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.UNPARK") != "On" ]]
+    do
+        sleep 1
+        timeout=$timeout-1
+        if [[ $timeout = 0 ]]
+	    then
+            echo " [ Error ]"
+		    echo "   -> Failed to unpark mount, ABORTING START"
+		    echo "Shutdown observatory!"
+		    #launch shutdown script
+		    ./shutdown.sh
+		    exit 82
+        fi
+    done
+    echo " [ OK ]"
+
 else
 	echo " [ Error ]"
 	echo "   -> Failed to open roof, ABORTING START"
 
 	echo "Shutdown observatory!"
-	#launch shutdown script		
+	#launch shutdown script
 	./shutdown.sh
 	exit 81
 fi
 
 
-
-#echo -n "Slew mount to HOME..."
-#targetRA=15.44
-#targetDEC=77.47
-
-#indi_setprop -p $INDI_PORT "EQMod Mount.ON_COORD_SET.SLEW=On"
-#indi_setprop -p $INDI_PORT "EQMod Mount.EQUATORIAL_EOD_COORD.RA;DEC=$targetRA;$targetDEC"
-#indi_eval -t 60 -p $INDI_PORT -wo 'abs("EQMod Mount.EQUATORIAL_EOD_COORD.RA"-'$targetRA')<0.05 && abs("EQMod Mount.EQUATORIAL_EOD_COORD.DEC"-'$targetDEC')<0.05'
-#echo " [ OK ]"
-#sleep 1
-
-
-
-
-
-
-
-
 echo "Observatory ready!"
 
-/home/astro/notificationtoIFTTT.sh 'Observatory ready!'
+/home/astro/notificationtoIFTTT.sh 'Observatory ready!' > /dev/null 2>&1
 
 echo "### START END ###"
 exit 0

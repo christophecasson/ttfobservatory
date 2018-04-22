@@ -3,30 +3,49 @@
 INDI_PORT=7500
 CNTRL_FIFO="/home/astro/fifo"
 
+declare -i timeout=0
 
 echo "### SHUTDOWN BEGIN ###"
 
-/home/astro/notificationtoIFTTT.sh 'Observatory shutdown started'
+../tools/notificationtoIFTTT.sh 'Observatory shutdown started' > /dev/null 2>&1
 
 echo -n "Checking powerboard status..."
-if [[ $(cat $CNTRL_FIFO/powerboard/status/board_state) = "OK" ]]
-then
-	echo " [ OK ]"
-else
-	echo " [ Error ]"
-	echo "   -> Powerboard error, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
-	exit 1
-fi
+timeout=60
+while [[ $(cat $CNTRL_FIFO/powerboard/status/board_state) != "OK" ]]
+do
+    echo -n "+"
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+	    echo " [ Error ]"
+	    echo "   -> Powerboard error, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
+	    exit 1
+    fi
+done
+echo " [ OK ]"
+
 
 echo -n "Checking indiserver status..."
-if [[ $(indi_getprop -p $INDI_PORT > /dev/null 2>&1; echo $?) != 2 ]]  #if indiserver running on $INDI_PORT
-then
-	echo " [ RUNNING ]"
-else
-	echo " [ STOPPED ]"
-	echo "      -> No indiserver found on port $INDI_PORT, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
-	exit 2
-fi
+timeout=60
+tempindiserver=0
+while [[ $(indi_getprop -p $INDI_PORT > /dev/null 2>&1; echo $?) -eq 2 ]]  #if indiserver not running on $INDI_PORT
+do
+    echo " [ STOPPED ]"
+    killall indiserver > /dev/null 2>&1
+    echo -n "   -> Launching temporary indiserver..."
+    indiserver -p $INDI_PORT -v indi_eqmod_telescope > /dev/null 2>&1 &
+    tempindiserver=1
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo "      -> Error starting indiserver, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
+	    exit 2
+    fi
+done
+echo " [ RUNNING ]"
+
 
 
 echo -n "Loading indi EQMod Mount parameters..."
@@ -37,36 +56,46 @@ echo " [ OK ]"
 echo -n "Checking Telescope Mount"
 # if mount is OFF, power ON and check if Parked
 # 	if previously OFF and unparked after power on -> ABORT AND WARN (mount in unknown position)
-if [[ $(cat $CNTRL_FIFO/powerboard/status/2) = "0" ]] 
+if [[ $(cat $CNTRL_FIFO/powerboard/status/2) == "0" ]]
 then #if mount is OFF
 	echo " [ OFF ]"
-	echo -n "   -> Power ON Mount to check park state..."	
-	echo 1 > /home/astro/fifo/powerboard/control/2
-	sleep 1
-	if [[ $(cat $CNTRL_FIFO/powerboard/status/2) = "1" ]]
-	then
-		echo " [ OK ]"
-	else
-		echo " [ Error ]"
-		echo "      -> Error powering Telescope Mount, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
-		exit 2
-	fi
+	echo -n "   -> Power ON Mount to check park state..."
+    timeout=60
+    while [[ $(cat $CNTRL_FIFO/powerboard/status/2) != "1" ]]
+    do
+        echo 1 > /home/astro/fifo/powerboard/control/2
+        sleep 1
+        timeout=$timeout-1
+        if [[ $timeout = 0 ]]
+        then
+            echo " [ Error ]"
+	        echo "  -> Error powering Telescope Mount, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
+	        exit 2
+        fi
+    done
+    echo " [ OK ]"
+
 	sleep 1
 	echo -n "   -> Connecting EQMod Mount..."
-	indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.CONNECT=On"
-	sleep 1
-	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.CONNECTION.CONNECT") != "On" ]]
-	then
-		echo " [ Error ]"
-		echo "      -> Error connecting EQMod Mount, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
-		exit 3
-	else
-		echo " [ OK ]"
-	fi
+    timeout=60
+	while [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.CONNECTION.CONNECT") != "On" ]]
+	do
+        indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.CONNECT=On"
+        sleep 1
+        timeout=$timeout-1
+        if [[ $timeout = 0 ]]
+        then
+            echo " [ Error ]"
+		    echo "      -> Error connecting EQMod Mount, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
+		    exit 3
+        fi
+    done
+	echo " [ OK ]"
+
 	echo -n "   -> Telescope Mount Park state:"
-	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") = "On" ]]
+	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") == "On" ]]
 	then
-		echo " [ PARKED ]"	
+		echo " [ PARKED ]"
 	else
 		echo " [ UNPARKED ]"
 		echo "      -> Mount was powered off UNPARKED, it may be in UNKNOWN POSITION"
@@ -77,24 +106,31 @@ then #if mount is OFF
 else #if mount is ON
 	echo "[ ON ]"
 	echo -n "   -> Connecting EQMod Mount..."
-	indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.CONNECT=On"
-	sleep 1
-	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.CONNECTION.CONNECT") != "On" ]]
-	then
-		echo " [ Error ]"
-		echo "      -> Error connecting EQMod Mount, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
-		exit 5
-	else
-		echo " [ OK ]"
-	fi
+    timeout=60
+	while [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.CONNECTION.CONNECT") != "On" ]]
+	do
+        indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.CONNECT=On"
+        sleep 1
+        timeout=$timeout-1
+        if [[ $timeout = 0 ]]
+        then
+            echo " [ Error ]"
+		    echo "      -> Error connecting EQMod Mount, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
+		    exit 3
+        fi
+    done
+	echo " [ OK ]"
+
+
 	echo -n "   -> Telescope Mount Park state:"
-	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") = "On" ]]
+	if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") == "On" ]]
 	then
-		echo " [ PARKED ]"	
+		echo " [ PARKED ]"
 	else
 		echo " [ UNPARKED ]"
 	fi
 fi
+
 
 
 
@@ -111,11 +147,14 @@ else
 	echo " [ OK ]"
 fi
 
+
+
+
 echo -n "Checking Telescope Mount..."
-#mount must be PARKED (if not parked after power-on, mount may be in dangerous position -> shutdown and warn)
 if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") = "On" ]]
 then
         echo " [ OK ]"
+        sleep 1
         currentRA=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.CURRENTSTEPPERS.RAStepsCurrent"`
         currentDEC=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.CURRENTSTEPPERS.DEStepsCurrent"`
         parkRA=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK_POSITION.PARK_RA"`
@@ -127,7 +166,7 @@ then
                 echo " [ RA OK ]"
         else
                 echo " [ RA NOT PARKED ]"
-                echo "   -> Telescope mount is not PARKED after power on [ it may be in UNKNOWN POSITION ], ABORTING SHUTDOWN"
+                echo "   -> Telescope mount is not PARKED, ABORTING SHUTDOWN"
                 exit 61
         fi
         echo -n "   -> DEC=$currentDEC (parked at $parkDEC)"
@@ -136,7 +175,7 @@ then
                 echo " [ DEC OK ]"
         else
                 echo " [ DEC NOT PARKED ]"
-                echo "   -> Telescope mount is not PARKED after power on [ it may be in UNKNOWN POSITION ], ABORTING SHUTDOWN"
+                echo "   -> Telescope mount is not PARKED, ABORTING SHUTDOWN"
                 exit 62
         fi
 
@@ -150,11 +189,9 @@ then
 
 else
         echo " [ ERROR ]"
-        echo "   -> Telescope mount is not PARKED after power on [ it may be in UNKNOWN POSITION ], ABORTING SHUTDOWN"
+        echo "   -> Telescope mount is not PARKED, ABORTING SHUTDOWN"
         exit 60
 fi
-
-
 
 echo -n "Closing roof..."
 echo 1 > /home/astro/fifo/powerboard/control/1
@@ -173,7 +210,7 @@ do
 	if [[ $rooftimeout = 0 ]]
 	then
 		echo " [ Error ]"
-		echo "   -> Error closing roof, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"	
+		echo "   -> Error closing roof, cannot continue. WARNING: OBSERVATORY MAY BE IN UNSAFE POSITION!"
 		exit 7
 	fi
 done
@@ -190,6 +227,7 @@ indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONNECTION.DISCONNECT=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONNECTION.DISCONNECT=On"
 indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
 indi_setprop -p $INDI_PORT "Joystick.CONNECTION.DISCONNECT=On"
+sleep 1
 echo " [ OK ]"
 
 
@@ -198,62 +236,38 @@ echo " [ OK ]"
 
 
 echo -n "Powering OFF ALL powerboard outputs..."
-echo 0 > /home/astro/fifo/powerboard/control/1
-echo 0 > /home/astro/fifo/powerboard/control/2
-echo 0 > /home/astro/fifo/powerboard/control/3
-echo 0 > /home/astro/fifo/powerboard/control/4
-echo 0 > /home/astro/fifo/powerboard/control/5
-echo 0 > /home/astro/fifo/powerboard/control/6
-echo " [ OK ]"
 
-sleep 2
+timeout=60
+while [[ $(cat $CNTRL_FIFO/powerboard/status/board_state) != "OK" ]]
+do
+    echo -n "+"
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+	    echo " [ Error ]"
+	    echo "   -> Powerboard error"
+	    exit 1
+    fi
+done
 
-echo -n "Checking power board status..."
-#powerboard must be OK and all OFF
-if [[ $(cat $CNTRL_FIFO/powerboard/status/board_state) != "OK" ]]
-then
-	echo " [ Error ]"
-	echo "  -> Powerboard error"
-	exit 10
-fi
-if [[ $(cat $CNTRL_FIFO/powerboard/status/1) != "0" ]]
-then
-	echo " [ Error ]"
-	echo "  -> Powerboard error: OUT 1 not powered OFF"
-	exit 11
-fi
-if [[ $(cat $CNTRL_FIFO/powerboard/status/2) != "0" ]]
-then
-	echo " [ Error ]"
-	echo "  -> Powerboard error: OUT 2 not powered OFF"
-	exit 12
-fi
-if [[ $(cat $CNTRL_FIFO/powerboard/status/3) != "0" ]]
-then
-	echo " [ Error ]"
-	echo "  -> Powerboard error: OUT 3 not powered OFF"
-	exit 13
-fi
-if [[ $(cat $CNTRL_FIFO/powerboard/status/4) != "0" ]]
-then
-	echo " [ Error ]"
-	echo "  -> Powerboard error: OUT 4 not powered OFF"
-	exit 14
-fi
-if [[ $(cat $CNTRL_FIFO/powerboard/status/5) != "0" ]]
-then
-	echo " [ Error ]"
-	echo "  -> Powerboard error: OUT 5 not powered OFF"
-	exit 15
-fi
-if [[ $(cat $CNTRL_FIFO/powerboard/status/6) != "0" ]]
-then
-	echo " [ Error ]"
-	echo "  -> Powerboard error: OUT 6 not powered OFF"
-	exit 16
-fi
-echo " [ OK ]"
-
+for pwrboardout in '1' '2' '3' '4' '5' '6'
+do
+    timeout=60
+    while [[ $(cat $CNTRL_FIFO/powerboard/status/$pwrboardout) != "0" ]]
+    do
+        echo 0 > /home/astro/fifo/powerboard/control/$pwrboardout
+        sleep 1
+        timeout=$timeout-1
+        if [[ $timeout = 0 ]]
+        then
+            echo " [ Error ]"
+	        echo "  -> Powerboard error: OUT $pwrboardout not powered OFF"
+	        exit 11
+        fi
+    done
+done
+echo "[ OK ]"
 
 echo -n "Checking roof state..."
 #roof closed lock must be OK
@@ -266,8 +280,14 @@ fi
 echo " [ OK ]"
 
 
-echo "Observatory closed and shutdown!" 
-/home/astro/notificationtoIFTTT.sh 'Observatory closed and shutdown!'
+if [ $tempindiserver -eq 1 ]
+then
+    echo "killing temporary indiserver..."
+    killall indiserver > /dev/null 2>&1
+fi
+
+echo "Observatory closed and shutdown!"
+../tools/notificationtoIFTTT.sh 'Observatory closed and shutdown!' > /dev/null 2>&1
 
 echo "### SHUTDOWN END ###"
 
