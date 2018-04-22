@@ -185,6 +185,15 @@ echo " [ OK ]"
 sleep 2
 
 
+echo -n "Reloading indi devices parameters..."
+indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "Joystick.CONFIG_PROCESS.CONFIG_LOAD=On"
+echo " [ OK ]"
 
 
 echo -n "Checking Telescope Mount..."
@@ -234,20 +243,18 @@ fi
 
 
 echo "Checking Weather conditions..."
-indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
-sleep 1
-weather_forecast="Idle"
-weather_temperature="Idle"
-weather_windspeed="Idle"
-weather_rainhour="Idle"
+indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
+weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
+weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
+weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
+weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
 
 timeout=60
 while [[ $weather_forecast =~ ^(Idle|Busy)$ ]]
 do
     #echo -n "+"
     echo "   -> WEATHER_FORECAST=$weather_forecast"
-    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
-    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On"
+    indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
     indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
     sleep 1
     weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
@@ -265,8 +272,7 @@ while [[ $weather_temperature =~ ^(Idle|Busy)$ ]]
 do
     #echo -n "*"
     echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
-    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
-    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On"
+    indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
     indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
     sleep 1
     weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
@@ -284,8 +290,7 @@ while [[ $weather_windspeed =~ ^(Idle|Busy)$ ]]
 do
     #echo -n "."
     echo "   -> WEATHER_WIND_SPEED=$weather_windspeed"
-    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
-    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On"
+    indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
     indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
     sleep 1
     weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
@@ -303,8 +308,7 @@ while [[ $weather_rainhour =~ ^(Idle|Busy)$ ]]
 do
     #echo -n "-"
     echo "   -> WEATHER_RAIN_HOUR=$weather_rainhour"
-    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
-    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On"
+    indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
     indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
     sleep 1
     weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
@@ -317,10 +321,7 @@ do
     fi
 done
 
-#weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
-#weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
-#weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
-#weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
+
 
 echo "   -> WEATHER_FORECAST=$weather_forecast"
 echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
