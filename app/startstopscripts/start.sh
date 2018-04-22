@@ -236,16 +236,18 @@ fi
 echo "Checking Weather conditions..."
 indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
 sleep 1
-weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
-weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
-weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
-weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
+weather_forecast="Idle"
+weather_temperature="Idle"
+weather_windspeed="Idle"
+weather_rainhour="Idle"
 
 timeout=60
 while [[ $weather_forecast =~ ^(Idle|Busy)$ ]]
 do
     #echo -n "+"
     echo "   -> WEATHER_FORECAST=$weather_forecast"
+    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
+    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On"
     indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
     sleep 1
     weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
@@ -263,6 +265,8 @@ while [[ $weather_temperature =~ ^(Idle|Busy)$ ]]
 do
     #echo -n "*"
     echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
+    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
+    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On"
     indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
     sleep 1
     weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
@@ -280,6 +284,8 @@ while [[ $weather_windspeed =~ ^(Idle|Busy)$ ]]
 do
     #echo -n "."
     echo "   -> WEATHER_WIND_SPEED=$weather_windspeed"
+    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
+    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On"
     indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
     sleep 1
     weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
@@ -297,6 +303,8 @@ while [[ $weather_rainhour =~ ^(Idle|Busy)$ ]]
 do
     #echo -n "-"
     echo "   -> WEATHER_RAIN_HOUR=$weather_rainhour"
+    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
+    #indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On"
     indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
     sleep 1
     weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
@@ -308,6 +316,11 @@ do
 	    exit 74
     fi
 done
+
+#weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
+#weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
+#weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
+#weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
 
 echo "   -> WEATHER_FORECAST=$weather_forecast"
 echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
@@ -321,7 +334,7 @@ else
 	echo "   -> Current weather conditions are unsafe, ABORTING START"
 	echo "Shutdown observatory!"
 	#launch shutdown script
-	./shutdown.sh
+	/home/astro/DEV/ttfobservatory/app/startstopscripts/shutdown.sh
 	exit 70
 fi
 
@@ -349,7 +362,7 @@ if [ $openRoof == true ]
 
 		    echo "Shutdown observatory!"
 		    #launch shutdown script
-		    ./shutdown.sh
+		    /home/astro/DEV/ttfobservatory/app/startstopscripts/shutdown.sh
 		    exit 80
 	    fi
     done
@@ -376,7 +389,7 @@ if [ $openRoof == true ]
 		            echo "   -> Failed to unpark mount, ABORTING START"
 		            echo "Shutdown observatory!"
 		            #launch shutdown script
-		            ./shutdown.sh
+		            /home/astro/DEV/ttfobservatory/app/startstopscripts/shutdown.sh
 		            exit 82
                 fi
             done
@@ -388,7 +401,7 @@ if [ $openRoof == true ]
 
 	        echo "Shutdown observatory!"
 	        #launch shutdown script
-	        ./shutdown.sh
+	        /home/astro/DEV/ttfobservatory/app/startstopscripts/shutdown.sh
 	        exit 81
         fi
 
