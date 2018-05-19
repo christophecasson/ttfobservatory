@@ -272,12 +272,19 @@ echo "[ OK ]"
 
 echo -n "Checking roof state..."
 #roof closed lock must be OK
-if [[ $(cat $CNTRL_FIFO/roof/status/closed) != "1" ]]
-then
-	echo " [ Error ]"
-	echo "  -> Roof error: Closed lock not enabled"
-	exit 20
-fi
+timeout=60
+while [[ $(cat $CNTRL_FIFO/roof/status/closed) != "1" ]]
+do
+    echo -n "+"
+    sleep 1
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+	    echo " [ Error ]"
+	    echo "  -> Roof error: Closed lock not enabled"
+	    exit 20
+    fi
+done
 echo " [ OK ]"
 
 
