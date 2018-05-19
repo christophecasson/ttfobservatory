@@ -161,7 +161,7 @@ then
         parkDEC=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK_POSITION.PARK_DEC"`
 
         echo -n "   -> RA=$currentRA (parked at $parkRA)"
-        if [[ $currentRA = $parkRA ]]
+        if [[ $currentRA -lt $((parkRA+100)) ]] && [[ $currentRA -gt $((parkRA-100)) ]]
         then
                 echo " [ RA OK ]"
         else
@@ -170,7 +170,7 @@ then
                 exit 61
         fi
         echo -n "   -> DEC=$currentDEC (parked at $parkDEC)"
-        if [[ $currentDEC = $parkDEC ]]
+        if [[ $currentDEC -lt $((parkDEC+100)) ]] && [[ $currentDEC -gt $((parkDEC-100)) ]]
         then
                 echo " [ DEC OK ]"
         else
@@ -179,7 +179,8 @@ then
                 exit 62
         fi
 
-        if [[ $currentRA = $parkRA ]] && [[ $currentDEC = $parkDEC ]]
+        #if [[ $currentRA = $parkRA ]] && [[ $currentDEC = $parkDEC ]]
+        if [[ $currentRA -lt $((parkRA+100)) ]] && [[ $currentRA -gt $((parkRA-100)) ]] && [[ $currentDEC -lt $((parkDEC+100)) ]] && [[ $currentDEC -gt $((parkDEC-100)) ]]
         then
                 echo "Mount is parked!"
         else
