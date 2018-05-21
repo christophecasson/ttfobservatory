@@ -4,6 +4,7 @@ INDI_PORT=7500
 CNTRL_FIFO="/home/astro/fifo"
 
 declare -i timeout=0
+tolerance=100
 
 echo "### SHUTDOWN BEGIN ###"
 
@@ -138,12 +139,16 @@ if [[ $(indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK.PARK") = "On" 
 then
 	echo "Telescope is already PARKED"
 else
-	echo -n "Park Telescope Mount..."
+	echo "Disable ST4 guiding..."
+    indi_setprop -p $INDI_PORT "EQMod Mount.GUIDE_RATE.GUIDE_RATE_WE=0"
+    indi_setprop -p $INDI_PORT "EQMod Mount.GUIDE_RATE.GUIDE_RATE_NS=0"
+    echo "Park Telescope Mount..."
 	indi_setprop -p $INDI_PORT "EQMod Mount.TELESCOPE_PARK.PARK=On"
 	sleep 1
 	parkRA=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK_POSITION.PARK_RA"`
 	parkDEC=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK_POSITION.PARK_DEC"`
-	indi_eval -t 120 -p $INDI_PORT -wo '"EQMod Mount.CURRENTSTEPPERS.RAStepsCurrent"=='$parkRA' && "EQMod Mount.CURRENTSTEPPERS.DEStepsCurrent"=='$parkDEC
+	#indi_eval -t 120 -p $INDI_PORT -wo '"EQMod Mount.CURRENTSTEPPERS.RAStepsCurrent"=='$parkRA' && "EQMod Mount.CURRENTSTEPPERS.DEStepsCurrent"=='$parkDEC
+    indi_eval -t 120 -p $INDI_PORT -wo 'abs("EQMod Mount.CURRENTSTEPPERS.RAStepsCurrent"-'$parkRA')<'$tolerance' && abs("EQMod Mount.CURRENTSTEPPERS.DEStepsCurrent"-'$parkDEC')<'$tolerance
 	echo " [ OK ]"
 fi
 
@@ -161,7 +166,7 @@ then
         parkDEC=`indi_getprop -p $INDI_PORT -1 "EQMod Mount.TELESCOPE_PARK_POSITION.PARK_DEC"`
 
         echo -n "   -> RA=$currentRA (parked at $parkRA)"
-        if [[ $currentRA -lt $((parkRA+100)) ]] && [[ $currentRA -gt $((parkRA-100)) ]]
+        if [[ $currentRA -lt $((parkRA+$tolerance)) ]] && [[ $currentRA -gt $((parkRA-$tolerance)) ]]
         then
                 echo " [ RA OK ]"
         else
@@ -170,7 +175,7 @@ then
                 exit 61
         fi
         echo -n "   -> DEC=$currentDEC (parked at $parkDEC)"
-        if [[ $currentDEC -lt $((parkDEC+100)) ]] && [[ $currentDEC -gt $((parkDEC-100)) ]]
+        if [[ $currentDEC -lt $((parkDEC+$tolerance)) ]] && [[ $currentDEC -gt $((parkDEC-$tolerance)) ]]
         then
                 echo " [ DEC OK ]"
         else
@@ -180,7 +185,7 @@ then
         fi
 
         #if [[ $currentRA = $parkRA ]] && [[ $currentDEC = $parkDEC ]]
-        if [[ $currentRA -lt $((parkRA+100)) ]] && [[ $currentRA -gt $((parkRA-100)) ]] && [[ $currentDEC -lt $((parkDEC+100)) ]] && [[ $currentDEC -gt $((parkDEC-100)) ]]
+        if [[ $currentRA -lt $((parkRA+$tolerance)) ]] && [[ $currentRA -gt $((parkRA-$tolerance)) ]] && [[ $currentDEC -lt $((parkDEC+$tolerance)) ]] && [[ $currentDEC -gt $((parkDEC-$tolerance)) ]]
         then
                 echo "Mount is parked!"
         else
