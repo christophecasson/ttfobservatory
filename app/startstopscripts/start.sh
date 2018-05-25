@@ -127,6 +127,7 @@ indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Joystick.CONFIG_PROCESS.CONFIG_LOAD=On"
 echo " [ OK ]"
@@ -168,6 +169,21 @@ do
 done
 echo " [ OK ]"
 
+echo -n "Connecting Flip Flat..."
+while [[ $(indi_setprop -p $INDI_PORT "Flip Flat.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
+do
+	sleep 1
+done
+indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_ON=On"
+indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_INTENSITY.FLAT_LIGHT_INTENSITY_VALUE=10"
+sleep 1
+indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_INTENSITY.FLAT_LIGHT_INTENSITY_VALUE=100"
+sleep 1
+indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_INTENSITY.FLAT_LIGHT_INTENSITY_VALUE=255"
+sleep 1
+indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
+echo " [ OK ]"
+
 echo -n "Connecting WunderGround..."
 while [[ $(indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
 do
@@ -191,6 +207,7 @@ indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Joystick.CONFIG_PROCESS.CONFIG_LOAD=On"
 echo " [ OK ]"
@@ -250,7 +267,7 @@ weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WE
 weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
 
 timeout=60
-while [[ $weather_forecast =~ ^(Idle|Busy)$ ]]
+while [[ $weather_forecast =~ ^(Idle|)$ ]]
 do
     #echo -n "+"
     echo "   -> WEATHER_FORECAST=$weather_forecast"
@@ -268,7 +285,7 @@ do
 done
 
 timeout=60
-while [[ $weather_temperature =~ ^(Idle|Busy)$ ]]
+while [[ $weather_temperature =~ ^(Idle|)$ ]]
 do
     #echo -n "*"
     echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
@@ -286,7 +303,7 @@ do
 done
 
 timeout=60
-while [[ $weather_windspeed =~ ^(Idle|Busy)$ ]]
+while [[ $weather_windspeed =~ ^(Idle|)$ ]]
 do
     #echo -n "."
     echo "   -> WEATHER_WIND_SPEED=$weather_windspeed"
@@ -304,7 +321,7 @@ do
 done
 
 timeout=60
-while [[ $weather_rainhour =~ ^(Idle|Busy)$ ]]
+while [[ $weather_rainhour =~ ^(Idle|)$ ]]
 do
     #echo -n "-"
     echo "   -> WEATHER_RAIN_HOUR=$weather_rainhour"
@@ -372,6 +389,31 @@ if [ $openRoof == true ]
 
     if [ $unparkMount == true ]
     then
+        echo -n "Opening Telescope Cap..."
+        indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
+
+        indi_setprop -p $INDI_PORT "Flip Flat.CAP_PARK.UNPARK=On"
+	    sleep 1
+        timeout=60
+	    while [[ $(indi_getprop -p $INDI_PORT -1 "Flip Flat.Status.Cover") != "Open" ]]
+        do
+            echo -n "+"
+            sleep 1
+            timeout=$timeout-1
+            if [[ $timeout = 0 ]]
+	        then
+                echo " [ Error ]"
+		        echo "   -> Failed to uncap telescope, ABORTING START"
+		        echo "Shutdown observatory!"
+		        #launch shutdown script
+		        #/home/astro/DEV/ttfobservatory/app/startstopscripts/shutdown.sh
+		        exit 83
+            fi
+        done
+        echo " [ OK ]"
+
+
+
         echo -n "Unparking Telescope Mount..."
         #if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]] &&
         timeout=60
@@ -413,6 +455,30 @@ if [ $openRoof == true ]
         echo " [ OK ]"
     fi
 fi
+
+
+echo -n "Opening Telescope Cap..."
+        indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
+
+        indi_setprop -p $INDI_PORT "Flip Flat.CAP_PARK.UNPARK=On"
+	    sleep 1
+        timeout=60
+	    while [[ $(indi_getprop -p $INDI_PORT -1 "Flip Flat.Status.Cover") != "Open" ]]
+        do
+            echo -n "+"
+            sleep 1
+            timeout=$timeout-1
+            if [[ $timeout = 0 ]]
+	        then
+                echo " [ Error ]"
+		        echo "   -> Failed to uncap telescope, ABORTING START"
+		        echo "Shutdown observatory!"
+		        #launch shutdown script
+		        #/home/astro/DEV/ttfobservatory/app/startstopscripts/shutdown.sh
+		        exit 83
+            fi
+        done
+        echo " [ OK ]"
 
 
 echo "Observatory ready!"

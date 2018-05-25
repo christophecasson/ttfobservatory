@@ -224,15 +224,45 @@ echo " [ OK ]"
 sleep 1
 
 
+if [ $tempindiserver -eq 0 ]
+then
+    echo -n "Closing telescope Cap..."
+    indi_setprop -p $INDI_PORT "Flip Flat.CONNECTION.CONNECT=On"
+    sleep 1
+    indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"
+    sleep 1
+    indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
+    indi_setprop -p $INDI_PORT "Flip Flat.CAP_PARK.PARK=On"
+    sleep 1
+    timeout=60
+    while [[ $(indi_getprop -p $INDI_PORT -1 "Flip Flat.Status.Cover") != "Closed" ]]
+    do
+        echo -n "+"
+        sleep 1
+        timeout=$timeout-1
+        if [[ $timeout = 0 ]]
+        then
+            echo " [ Error ]"
+            echo "   -> Failed to cap telescope"
+            exit 83
+        fi
+    done
+    echo " [ OK ]"
+fi
+
 
 echo -n "Disconnect devices..."
-indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONNECTION.DISCONNECT=On"
 indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.DISCONNECT=On"
-indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONNECTION.DISCONNECT=On"
-indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONNECTION.DISCONNECT=On"
-indi_setprop -p $INDI_PORT "MoonLite.CONNECTION.DISCONNECT=On"
-indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
-indi_setprop -p $INDI_PORT "Joystick.CONNECTION.DISCONNECT=On"
+if [ $tempindiserver -eq 0 ]
+then
+    indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "MoonLite.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "Flip Flat.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "Joystick.CONNECTION.DISCONNECT=On"
+fi
 sleep 1
 echo " [ OK ]"
 
