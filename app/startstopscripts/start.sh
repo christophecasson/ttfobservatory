@@ -121,6 +121,23 @@ echo " [ OK ]"
 
 sleep 2
 
+echo 1 > /home/astro/fifo/powerboard/control/1
+echo 1 > /home/astro/fifo/powerboard/control/2
+echo 1 > /home/astro/fifo/powerboard/control/3
+echo 1 > /home/astro/fifo/powerboard/control/4
+echo 1 > /home/astro/fifo/powerboard/control/1
+echo 1 > /home/astro/fifo/powerboard/control/2
+echo 1 > /home/astro/fifo/powerboard/control/3
+echo 1 > /home/astro/fifo/powerboard/control/4
+echo 1 > /home/astro/fifo/powerboard/control/1
+echo 1 > /home/astro/fifo/powerboard/control/2
+echo 1 > /home/astro/fifo/powerboard/control/3
+echo 1 > /home/astro/fifo/powerboard/control/4
+
+
+
+sleep 2
+
 echo -n "Loading indi devices parameters..."
 indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
