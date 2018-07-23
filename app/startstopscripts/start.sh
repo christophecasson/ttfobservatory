@@ -389,31 +389,6 @@ if [ $openRoof == true ]
 
     if [ $unparkMount == true ]
     then
-        echo -n "Opening Telescope Cap..."
-        indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
-
-        indi_setprop -p $INDI_PORT "Flip Flat.CAP_PARK.UNPARK=On"
-	    sleep 1
-        timeout=60
-	    while [[ $(indi_getprop -p $INDI_PORT -1 "Flip Flat.Status.Cover") != "Open" ]]
-        do
-            echo -n "+"
-            sleep 1
-            timeout=$timeout-1
-            if [[ $timeout = 0 ]]
-	        then
-                echo " [ Error ]"
-		        echo "   -> Failed to uncap telescope, ABORTING START"
-		        echo "Shutdown observatory!"
-		        #launch shutdown script
-		        #/home/astro/DEV/ttfobservatory/app/startstopscripts/shutdown.sh
-		        exit 83
-            fi
-        done
-        echo " [ OK ]"
-
-
-
         echo -n "Unparking Telescope Mount..."
         #if [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_PARK.UNPARK") = "On" ]] && [[ $(indi_getprop -p $INDI_PORT -1 "Dome Scripting Gateway.DOME_SHUTTER.SHUTTER_OPEN") = "On" ]] &&
         timeout=60
@@ -453,11 +428,8 @@ if [ $openRoof == true ]
             fi
         done
         echo " [ OK ]"
-    fi
-fi
-
-
-echo -n "Opening Telescope Cap..."
+        
+	echo -n "Opening Telescope Cap..."
         indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
 
         indi_setprop -p $INDI_PORT "Flip Flat.CAP_PARK.UNPARK=On"
@@ -478,7 +450,11 @@ echo -n "Opening Telescope Cap..."
 		        exit 83
             fi
         done
-        echo " [ OK ]"
+        
+	echo " [ OK ]"
+    fi
+fi
+
 
 
 echo "Observatory ready!"
