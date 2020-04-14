@@ -1,0 +1,178 @@
+
+*** /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt ***
+[2019-02-27T21:40:18.772 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:18.778 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsO11133.fits"
+[2019-02-27T21:40:19.270 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:19.277 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsM11133.fits"
+[2019-02-27T21:40:20.044 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:20.049 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsB11133.fits"
+[2019-02-27T21:40:21.050 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:21.056 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsd11133.fits"
+[2019-02-27T21:40:21.550 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:21.556 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitse11133.fits"
+[2019-02-27T21:40:22.325 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:22.330 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsq11133.fits"
+[2019-02-27T21:40:22.828 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:22.835 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsw11133.fits"
+[2019-02-27T21:40:23.615 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:23.619 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsW11133.fits"
+[2019-02-27T21:40:24.111 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:24.119 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsF11133.fits"
+[2019-02-27T21:40:24.887 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:24.894 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsK11133.fits"
+[2019-02-27T21:40:25.396 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:25.402 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsG11133.fits"
+[2019-02-27T21:40:26.169 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:26.174 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsW11133.fits"
+[2019-02-27T21:40:26.666 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:26.678 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsd11133.fits"
+[2019-02-27T21:40:27.419 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:27.424 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsl11133.fits"
+[2019-02-27T21:40:27.993 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:27.996 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsj11133.fits"
+
+*** recently changed files ***
+   1  2019-02-27 21:40:27  /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt
+   2  2019-02-27 00:06:32  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-32-47.txt
+   3  2019-02-26 23:32:43  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-24-37.txt
+   4  2019-02-26 23:20:55  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-21-47.txt
+   5  2019-02-25 21:21:05  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-16-40.txt
+   6  2019-02-25 21:16:02  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-02-51.txt
+   7  2019-02-25 21:00:52  /home/astro/.local/share/kstars/logs/2019-02-24/log_21-01-11.txt
+   8  2019-02-24 20:49:50  /home/astro/.local/share/kstars/logs/2019-02-24/log_20-49-48.txt
+currently watching:  47 files  25 dirs  2 unknown entries
+
+*** /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt ***
+[2019-02-27T21:40:28.763 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:28.768 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsO11133.fits"
+[2019-02-27T21:40:29.277 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:29.281 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsY11133.fits"
+(note: use "ctrl-\" SIQUIT to exit program)
+
+*** recently changed files ***
+   1  2019-02-27 21:40:29  /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt
+   2  2019-02-27 00:06:32  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-32-47.txt
+   3  2019-02-26 23:32:43  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-24-37.txt
+   4  2019-02-26 23:20:55  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-21-47.txt
+   5  2019-02-25 21:21:05  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-16-40.txt
+   6  2019-02-25 21:16:02  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-02-51.txt
+   7  2019-02-25 21:00:52  /home/astro/.local/share/kstars/logs/2019-02-24/log_21-01-11.txt
+   8  2019-02-24 20:49:50  /home/astro/.local/share/kstars/logs/2019-02-24/log_20-49-48.txt
+currently watching:  47 files  25 dirs  2 unknown entries
+
+*** /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt ***
+[2019-02-27T21:40:30.047 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:30.053 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsy11133.fits"
+[2019-02-27T21:40:30.550 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:30.556 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsZ11133.fits"
+
+*** /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt ***
+[2019-02-27T21:40:47.083 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:47.088 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsQ11133.fits"
+[2019-02-27T21:40:47.858 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:47.865 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsR11133.fits"
+[2019-02-27T21:40:48.358 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:48.364 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitso11133.fits"
+[2019-02-27T21:40:49.132 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:49.137 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsJ11133.fits"
+[2019-02-27T21:40:49.641 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:49.646 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsg11133.fits"
+[2019-02-27T21:40:50.427 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:50.432 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsM11133.fits"
+
+*** recently changed files ***
+   1  2019-02-27 21:40:50  /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt
+   2  2019-02-27 00:06:32  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-32-47.txt
+   3  2019-02-26 23:32:43  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-24-37.txt
+   4  2019-02-26 23:20:55  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-21-47.txt
+   5  2019-02-25 21:21:05  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-16-40.txt
+   6  2019-02-25 21:16:02  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-02-51.txt
+   7  2019-02-25 21:00:52  /home/astro/.local/share/kstars/logs/2019-02-24/log_21-01-11.txt
+   8  2019-02-24 20:49:50  /home/astro/.local/share/kstars/logs/2019-02-24/log_20-49-48.txt
+currently watching:  47 files  25 dirs  2 unknown entries
+
+*** /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt ***
+[2019-02-27T21:40:50.926 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:50.932 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsB11133.fits"
+[2019-02-27T21:40:51.709 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:51.714 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsw11133.fits"
+[2019-02-27T21:40:52.716 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:52.722 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsT11133.fits"
+[2019-02-27T21:40:53.215 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:53.219 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsM11133.fits"
+(note: use "ctrl-\" SIQUIT to exit program)
+
+*** recently changed files ***
+   1  2019-02-27 21:40:53  /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt
+   2  2019-02-27 00:06:32  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-32-47.txt
+   3  2019-02-26 23:32:43  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-24-37.txt
+   4  2019-02-26 23:20:55  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-21-47.txt
+   5  2019-02-25 21:21:05  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-16-40.txt
+   6  2019-02-25 21:16:02  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-02-51.txt
+   7  2019-02-25 21:00:52  /home/astro/.local/share/kstars/logs/2019-02-24/log_21-01-11.txt
+   8  2019-02-24 20:49:50  /home/astro/.local/share/kstars/logs/2019-02-24/log_20-49-48.txt
+currently watching:  47 files  25 dirs  2 unknown entries
+(note: use "ctrl-\" SIQUIT to exit program)
+
+*** recently changed files ***
+   1  2019-02-27 21:40:53  /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt
+   2  2019-02-27 00:06:32  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-32-47.txt
+   3  2019-02-26 23:32:43  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-24-37.txt
+   4  2019-02-26 23:20:55  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-21-47.txt
+   5  2019-02-25 21:21:05  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-16-40.txt
+   6  2019-02-25 21:16:02  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-02-51.txt
+   7  2019-02-25 21:00:52  /home/astro/.local/share/kstars/logs/2019-02-24/log_21-01-11.txt
+   8  2019-02-24 20:49:50  /home/astro/.local/share/kstars/logs/2019-02-24/log_20-49-48.txt
+currently watching:  47 files  25 dirs  2 unknown entries
+
+*** /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt ***
+[2019-02-27T21:40:53.993 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:54.000 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsg11133.fits"
+(note: use "ctrl-\" SIQUIT to exit program)
+
+*** recently changed files ***
+   1  2019-02-27 21:40:53  /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt
+   2  2019-02-27 00:06:32  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-32-47.txt
+   3  2019-02-26 23:32:43  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-24-37.txt
+   4  2019-02-26 23:20:55  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-21-47.txt
+   5  2019-02-25 21:21:05  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-16-40.txt
+   6  2019-02-25 21:16:02  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-02-51.txt
+   7  2019-02-25 21:00:52  /home/astro/.local/share/kstars/logs/2019-02-24/log_21-01-11.txt
+   8  2019-02-24 20:49:50  /home/astro/.local/share/kstars/logs/2019-02-24/log_20-49-48.txt
+currently watching:  47 files  25 dirs  2 unknown entries
+(note: use "ctrl-\" SIQUIT to exit program)
+
+*** recently changed files ***
+   1  2019-02-27 21:40:53  /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt
+   2  2019-02-27 00:06:32  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-32-47.txt
+   3  2019-02-26 23:32:43  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-24-37.txt
+   4  2019-02-26 23:20:55  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-21-47.txt
+   5  2019-02-25 21:21:05  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-16-40.txt
+   6  2019-02-25 21:16:02  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-02-51.txt
+   7  2019-02-25 21:00:52  /home/astro/.local/share/kstars/logs/2019-02-24/log_21-01-11.txt
+   8  2019-02-24 20:49:50  /home/astro/.local/share/kstars/logs/2019-02-24/log_20-49-48.txt
+currently watching:  47 files  25 dirs  2 unknown entries
+(note: use "ctrl-\" SIQUIT to exit program)
+
+*** recently changed files ***
+   1  2019-02-27 21:40:53  /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt
+   2  2019-02-27 00:06:32  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-32-47.txt
+   3  2019-02-26 23:32:43  /home/astro/.local/share/kstars/logs/2019-02-26/log_23-24-37.txt
+   4  2019-02-26 23:20:55  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-21-47.txt
+   5  2019-02-25 21:21:05  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-16-40.txt
+   6  2019-02-25 21:16:02  /home/astro/.local/share/kstars/logs/2019-02-25/log_21-02-51.txt
+   7  2019-02-25 21:00:52  /home/astro/.local/share/kstars/logs/2019-02-24/log_21-01-11.txt
+   8  2019-02-24 20:49:50  /home/astro/.local/share/kstars/logs/2019-02-24/log_20-49-48.txt
+currently watching:  47 files  25 dirs  2 unknown entries
+
+*** /home/astro/.local/share/kstars/logs/2019-02-27/log_00-06-40.txt ***
+[2019-02-27T21:40:54.495 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:54.501 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsM11133.fits"
+[2019-02-27T21:40:55.262 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:55.267 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitso11133.fits"
+[2019-02-27T21:40:55.762 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:55.768 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsZ11133.fits"
+[2019-02-27T21:40:56.536 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:56.542 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsg11133.fits"
+[2019-02-27T21:40:57.089 CET INFO ][           org.kde.kstars.indi] - ZWO CCD ASI120MM :  "[INFO] Exposure done, downloading image... "
+[2019-02-27T21:40:57.093 CET INFO ][           org.kde.kstars.fits] - Loading FITS file  "/tmp/fitsG11133.fits"
