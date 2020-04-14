@@ -260,8 +260,8 @@ then
     indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "MoonLite.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "Flip Flat.CONNECTION.DISCONNECT=On"
-    indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.DISCONNECT=On"
-    indi_setprop -p $INDI_PORT "Joystick.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.CONNECTION.DISCONNECT=On"
+#    indi_setprop -p $INDI_PORT "Joystick.CONNECTION.DISCONNECT=On"
 fi
 sleep 1
 echo " [ OK ]"

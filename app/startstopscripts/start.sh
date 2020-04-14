@@ -145,8 +145,8 @@ indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"
-indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
-indi_setprop -p $INDI_PORT "Joystick.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "OpenWeatherMap.CONFIG_PROCESS.CONFIG_LOAD=On"
+#indi_setprop -p $INDI_PORT "Joystick.CONFIG_PROCESS.CONFIG_LOAD=On"
 echo " [ OK ]"
 
 sleep 2
@@ -201,19 +201,19 @@ sleep 1
 indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
 echo " [ OK ]"
 
-echo -n "Connecting WunderGround..."
-while [[ $(indi_setprop -p $INDI_PORT "WunderGround.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
+echo -n "Connecting OpenWeatherMap..."
+while [[ $(indi_setprop -p $INDI_PORT "OpenWeatherMap.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
 do
 	sleep 1
 done
 echo " [ OK ]"
 
-echo -n "Connecting Joystick..."
-while [[ $(indi_setprop -p $INDI_PORT "Joystick.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
-do
-	sleep 1
-done
-echo " [ OK ]"
+#echo -n "Connecting Joystick..."
+#while [[ $(indi_setprop -p $INDI_PORT "Joystick.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
+#do
+#	sleep 1
+#done
+#echo " [ OK ]"
 
 sleep 2
 
@@ -225,8 +225,8 @@ indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"
-indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
-indi_setprop -p $INDI_PORT "Joystick.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "OpenWeatherMap.CONFIG_PROCESS.CONFIG_LOAD=On"
+#indi_setprop -p $INDI_PORT "Joystick.CONFIG_PROCESS.CONFIG_LOAD=On"
 echo " [ OK ]"
 
 
@@ -277,21 +277,22 @@ fi
 
 
 echo "Checking Weather conditions..."
-indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
-weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
-weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
-weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
-weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
+indi_setprop -p $INDI_PORT "OpenWeatherMap.CONFIG_PROCESS.CONFIG_LOAD=On"
+weather_forecast=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_FORECAST"`
+weather_temperature=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_TEMPERATURE"`
+weather_windspeed=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_WIND_SPEED"`
+weather_rainhour=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
+weather_snowhour=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_SNOW_HOUR"`
 
 timeout=60
 while [[ $weather_forecast =~ ^(Idle|)$ ]]
 do
     #echo -n "+"
     echo "   -> WEATHER_FORECAST=$weather_forecast"
-    indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
-    indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.CONFIG_PROCESS.CONFIG_LOAD=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.WEATHER_REFRESH.REFRESH=On"
     sleep 1
-    weather_forecast=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_FORECAST"`
+    weather_forecast=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_FORECAST"`
     timeout=$timeout-1
     if [[ $timeout = 0 ]]
     then
@@ -306,10 +307,10 @@ while [[ $weather_temperature =~ ^(Idle|)$ ]]
 do
     #echo -n "*"
     echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
-    indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
-    indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.CONFIG_PROCESS.CONFIG_LOAD=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.WEATHER_REFRESH.REFRESH=On"
     sleep 1
-    weather_temperature=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_TEMPERATURE"`
+    weather_temperature=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_TEMPERATURE"`
     timeout=$timeout-1
     if [[ $timeout = 0 ]]
     then
@@ -324,10 +325,10 @@ while [[ $weather_windspeed =~ ^(Idle|)$ ]]
 do
     #echo -n "."
     echo "   -> WEATHER_WIND_SPEED=$weather_windspeed"
-    indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
-    indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.CONFIG_PROCESS.CONFIG_LOAD=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.WEATHER_REFRESH.REFRESH=On"
     sleep 1
-    weather_windspeed=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_WIND_SPEED"`
+    weather_windspeed=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_WIND_SPEED"`
     timeout=$timeout-1
     if [[ $timeout = 0 ]]
     then
@@ -342,10 +343,10 @@ while [[ $weather_rainhour =~ ^(Idle|)$ ]]
 do
     #echo -n "-"
     echo "   -> WEATHER_RAIN_HOUR=$weather_rainhour"
-    indi_setprop -p $INDI_PORT "WunderGround.CONFIG_PROCESS.CONFIG_LOAD=On"
-    indi_setprop -p $INDI_PORT "WunderGround.WEATHER_REFRESH.REFRESH=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.CONFIG_PROCESS.CONFIG_LOAD=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.WEATHER_REFRESH.REFRESH=On"
     sleep 1
-    weather_rainhour=`indi_getprop -p $INDI_PORT -1 "WunderGround.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
+    weather_rainhour=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_RAIN_HOUR"`
     timeout=$timeout-1
     if [[ $timeout = 0 ]]
     then
@@ -361,8 +362,9 @@ echo "   -> WEATHER_FORECAST=$weather_forecast"
 echo "   -> WEATHER_TEMPERATURE=$weather_temperature"
 echo "   -> WEATHER_WIND_SPEED=$weather_windspeed"
 echo "   -> WEATHER_RAIN_HOUR=$weather_rainhour"
+echo "   -> WEATHER_SNOW_HOUR=$weather_snowhour"
 
-if [[ $weather_forecast = "Ok" ]] && [[ $weather_temperature = "Ok" ]] && [[ $weather_windspeed = "Ok" ]] && [[ $weather_rainhour = "Ok" ]]
+if [[ $weather_forecast = "Ok" ]] && [[ $weather_temperature = "Ok" ]] && [[ $weather_windspeed = "Ok" ]] && [[ $weather_rainhour = "Ok" ]] & [[ $weather_snowhour = "Ok" ]]
 then
 	echo "   -> Current weather conditions are OK"
 else
@@ -445,7 +447,7 @@ if [ $openRoof == true ]
             fi
         done
         echo " [ OK ]"
-        
+
 	echo -n "Opening Telescope Cap..."
         indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
 
@@ -467,7 +469,7 @@ if [ $openRoof == true ]
 		        exit 83
             fi
         done
-        
+
 	echo " [ OK ]"
     fi
 fi
