@@ -54,7 +54,7 @@ def sigterm_handler(signum, frame):
 #	closefifos()
 	debug("exit(0)")
 	sys.exit(0)
- 
+
 signal.signal(signal.SIGINT, sigint_handler)
 signal.signal(signal.SIGTERM, sigterm_handler)
 
@@ -88,7 +88,7 @@ def readFifo(i):
 		lastitem = item[len(item)-1]
 		return lastitem
 	else:
-		return '' 
+		return ''
 
 def writeFifo(i, data):
 	fifo_path = fifo_control_path + str(i)
@@ -110,7 +110,7 @@ def setButtonON(button):
 	app.setButton(button, " ON  ")
 	app.setButtonBg(button, "red")
 	app.setButtonFg(button, "#202020")
-	
+
 def setButtonOFF(button):
 	app.setButton(button, " OFF ")
 	app.setButtonBg(button, "#202020")
@@ -151,7 +151,7 @@ def StateUpdater():
 
 	if last_board_vin != board_vin:
 		app.setLabel("l_Vin", "Vin="+board_vin)
-	
+
 	if board_state != "OK":
 		if board_state != last_board_state:
 			last_board_state = board_state
@@ -210,7 +210,7 @@ app.setLabelAlign("l_out2", "left")
 app.addButton("btn_out2", press, 2, 1)
 setButtonUnknown("btn_out2")
 
-app.addLabel("l_out3", "3: DSLR", 3, 0)
+app.addLabel("l_out3", "3: CCD", 3, 0)
 app.setLabelAlign("l_out3", "left")
 app.addButton("btn_out3", press, 3, 1)
 setButtonUnknown("btn_out3")

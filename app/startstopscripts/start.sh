@@ -70,7 +70,7 @@ do
 done
 echo " [ OK ]"
 
-echo -n "Powering ON CMOS..."
+echo -n "Powering ON CCD..."
 timeout=60
 while [[ $(cat $CNTRL_FIFO/powerboard/status/3) != "1" ]]
 do
@@ -80,7 +80,7 @@ do
     if [[ $timeout = 0 ]]
     then
         echo " [ Error ]"
-	    echo "  -> error powering ON CMOS, ABORTING START"
+	    echo "  -> error powering ON CCD, ABORTING START"
 	    exit 4
     fi
 done
@@ -142,6 +142,8 @@ echo -n "Loading indi devices parameters..."
 indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
 #indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "ZWO CCD ASI1600MM Pro.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "ASI EFW.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"
@@ -171,6 +173,20 @@ echo " [ OK ]"
 #	sleep 1
 #done
 #echo " [ OK ]"
+
+echo -n "Connecting ZWO CCD ASI1600MM Pro..."
+while [[ $(indi_setprop -p $INDI_PORT "ZWO CCD ASI1600MM Pro.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
+do
+	sleep 1
+done
+echo " [ OK ]"
+
+echo -n "Connecting ASI EFW..."
+while [[ $(indi_setprop -p $INDI_PORT "ASI EFW.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
+do
+	sleep 1
+done
+echo " [ OK ]"
 
 echo -n "Connecting ZWO CCD ASI120MM..."
 while [[ $(indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
@@ -222,6 +238,8 @@ echo -n "Reloading indi devices parameters..."
 indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
 #indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "ZWO CCD ASI1600MM Pro.CONFIG_PROCESS.CONFIG_LOAD=On"
+indi_setprop -p $INDI_PORT "ASI EFW.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"

@@ -257,11 +257,13 @@ if [ $tempindiserver -eq 0 ]
 then
     indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONNECTION.DISCONNECT=On"
     #indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "ZWO CCD ASI1600MM Pro.CONNECTION.DISCONNECT=On"
+    indi_setprop -p $INDI_PORT "ASI EFW.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "MoonLite.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "Flip Flat.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "OpenWeatherMap.CONNECTION.DISCONNECT=On"
-#    indi_setprop -p $INDI_PORT "Joystick.CONNECTION.DISCONNECT=On"
+    #indi_setprop -p $INDI_PORT "Joystick.CONNECTION.DISCONNECT=On"
 fi
 sleep 1
 echo " [ OK ]"
