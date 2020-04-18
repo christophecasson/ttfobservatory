@@ -259,7 +259,7 @@ indi_setprop -p $INDI_PORT "EQMod Mount.CONNECTION.DISCONNECT=On"
 if [ $tempindiserver -eq 0 ]
 then
     indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONNECTION.DISCONNECT=On"
-    indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONNECTION.DISCONNECT=On"
+    #indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "MoonLite.CONNECTION.DISCONNECT=On"
     indi_setprop -p $INDI_PORT "Flip Flat.CONNECTION.DISCONNECT=On"

@@ -70,7 +70,7 @@ do
 done
 echo " [ OK ]"
 
-echo -n "Powering ON DSLR..."
+echo -n "Powering ON CMOS..."
 timeout=60
 while [[ $(cat $CNTRL_FIFO/powerboard/status/3) != "1" ]]
 do
@@ -80,7 +80,7 @@ do
     if [[ $timeout = 0 ]]
     then
         echo " [ Error ]"
-	    echo "  -> error powering ON DSLR, ABORTING START"
+	    echo "  -> error powering ON CMOS, ABORTING START"
 	    exit 4
     fi
 done
@@ -141,7 +141,7 @@ sleep 2
 echo -n "Loading indi devices parameters..."
 indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
-indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
+#indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"
@@ -165,12 +165,12 @@ do
 done
 echo " [ OK ]"
 
-echo -n "Connecting Canon DSLR EOS 50D..."
-while [[ $(indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
-do
-	sleep 1
-done
-echo " [ OK ]"
+#echo -n "Connecting Canon DSLR EOS 50D..."
+#while [[ $(indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
+#do
+#	sleep 1
+#done
+#echo " [ OK ]"
 
 echo -n "Connecting ZWO CCD ASI120MM..."
 while [[ $(indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONNECTION.CONNECT=On" > /dev/null 2>&1; echo $?) != 0 ]]
@@ -221,7 +221,7 @@ sleep 2
 echo -n "Reloading indi devices parameters..."
 indi_setprop -p $INDI_PORT "Dome Scripting Gateway.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"
-indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
+#indi_setprop -p $INDI_PORT "Canon DSLR EOS 50D.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "ZWO CCD ASI120MM.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "MoonLite.CONFIG_PROCESS.CONFIG_LOAD=On"
 indi_setprop -p $INDI_PORT "Flip Flat.CONFIG_PROCESS.CONFIG_LOAD=On"
@@ -356,6 +356,24 @@ do
     fi
 done
 
+timeout=60
+while [[ $weather_snowhour =~ ^(Idle|)$ ]]
+do
+    #echo -n "-"
+    echo "   -> WEATHER_SNOW_HOUR=$weather_snowhour"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.CONFIG_PROCESS.CONFIG_LOAD=On"
+    indi_setprop -p $INDI_PORT "OpenWeatherMap.WEATHER_REFRESH.REFRESH=On"
+    sleep 1
+    weather_snowhour=`indi_getprop -p $INDI_PORT -1 "OpenWeatherMap.WEATHER_STATUS.WEATHER_SNOW_HOUR"`
+    timeout=$timeout-1
+    if [[ $timeout = 0 ]]
+    then
+        echo " [ Error ]"
+	    echo "  -> Error while retrieving weather_snowhour data, ABORTING START"
+	    exit 74
+    fi
+done
+
 
 
 echo "   -> WEATHER_FORECAST=$weather_forecast"
@@ -364,7 +382,7 @@ echo "   -> WEATHER_WIND_SPEED=$weather_windspeed"
 echo "   -> WEATHER_RAIN_HOUR=$weather_rainhour"
 echo "   -> WEATHER_SNOW_HOUR=$weather_snowhour"
 
-if [[ $weather_forecast = "Ok" ]] && [[ $weather_temperature = "Ok" ]] && [[ $weather_windspeed = "Ok" ]] && [[ $weather_rainhour = "Ok" ]] & [[ $weather_snowhour = "Ok" ]]
+if [[ $weather_forecast = "Ok" ]] && [[ $weather_temperature = "Ok" ]] && [[ $weather_windspeed = "Ok" ]] && [[ $weather_rainhour = "Ok" ]] && [[ $weather_snowhour = "Ok" ]]
 then
 	echo "   -> Current weather conditions are OK"
 else
