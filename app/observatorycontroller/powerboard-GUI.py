@@ -18,17 +18,13 @@ BOARDNAME = "powerboard"
 btn_state = {		"1":"-",
 			"2":"-",
 			"3":"-",
-			"4":"-",
-			"5":"-",
-			"6":"-"
+			"4":"-"
 }
 
 last_btn_state = {	"1":"-",
 			"2":"-",
 			"3":"-",
-			"4":"-",
-			"5":"-",
-			"6":"-"
+			"4":"-"
 }
 
 board_state = "Init..."
@@ -109,11 +105,11 @@ def writeFifo(i, data):
 def setButtonON(button):
 	app.setButton(button, " ON  ")
 	app.setButtonBg(button, "red")
-	app.setButtonFg(button, "#202020")
+	app.setButtonFg(button, "#00262B")
 
 def setButtonOFF(button):
 	app.setButton(button, " OFF ")
-	app.setButtonBg(button, "#202020")
+	app.setButtonBg(button, "#00262B")
 	app.setButtonFg(button, "#AAAAAA")
 
 def setButtonUnknown(button):
@@ -164,7 +160,7 @@ def StateUpdater():
 		if board_state != last_board_state:
 			last_board_state = board_state
 			app.setLabel("l_BoardStatus", "Board " + board_state)
-			app.setBg("#202020")
+			app.setBg("#00262B")
 			for name in btn_state:
 				last_btn_state[name] = not btn_state[name]
 
@@ -193,10 +189,10 @@ def press(button):
 
 
 # create GUI
-app = gui("Power Board", "225x600", handleArgs=False)
-app.setBg("#202020")
+app = gui("Power Board", "200x200", handleArgs=False)
+app.setBg("#00262B")
 app.setFg("red")
-app.setFont(20)
+app.setFont(16)
 
 
 
@@ -220,20 +216,22 @@ app.setLabelAlign("l_out4", "left")
 app.addButton("btn_out4", press, 4, 1)
 setButtonUnknown("btn_out4")
 
-app.addLabel("l_out5", "5: ", 5, 0)
-app.setLabelAlign("l_out5", "left")
-app.addButton("btn_out5", press, 5, 1)
-setButtonUnknown("btn_out5")
+#app.addLabel("l_out5", "5: ", 5, 0)
+#app.setLabelAlign("l_out5", "left")
+#app.addButton("btn_out5", press, 5, 1)
+#setButtonUnknown("btn_out5")
+#
+#app.addLabel("l_out6", "6: ", 6, 0)
+#app.setLabelAlign("l_out6", "left")
+#app.addButton("btn_out6", press, 6, 1)
+#setButtonUnknown("btn_out6")
 
-app.addLabel("l_out6", "6: ", 6, 0)
-app.setLabelAlign("l_out6", "left")
-app.addButton("btn_out6", press, 6, 1)
-setButtonUnknown("btn_out6")
 
-
-app.addLabel("l_BoardStatus")
-app.addLabel("l_Vin")
-app.getLabelWidget("l_Vin").config(font="Courier 14")
+app.addLabel("l_BoardStatus", "", 5, 0)
+app.getLabelWidget("l_BoardStatus").config(font="Courier 12")
+app.setLabelAlign("l_BoardStatus", "left")
+app.addLabel("l_Vin", "", 5, 1)
+app.getLabelWidget("l_Vin").config(font="Courier 12")
 
 
 

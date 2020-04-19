@@ -48,7 +48,7 @@ def sigterm_handler(signum, frame):
 #	closefifos()
 	debug("exit(0)")
 	sys.exit(0)
- 
+
 signal.signal(signal.SIGINT, sigint_handler)
 signal.signal(signal.SIGTERM, sigterm_handler)
 
@@ -82,7 +82,7 @@ def readFifo(i):
 		lastitem = item[len(item)-1]
 		return lastitem
 	else:
-		return '' 
+		return ''
 
 def writeFifo(i, data):
 	fifo_path = fifo_control_path + str(i)
@@ -103,11 +103,11 @@ def writeFifo(i, data):
 def setButtonON(button):
 	app.setButton(button, " ON  ")
 	app.setButtonBg(button, "red")
-	app.setButtonFg(button, "#202020")
-	
+	app.setButtonFg(button, "#00262B")
+
 def setButtonOFF(button):
 	app.setButton(button, " OFF ")
-	app.setButtonBg(button, "#202020")
+	app.setButtonBg(button, "#00262B")
 	app.setButtonFg(button, "#AAAAAA")
 
 def setButtonUnknown(button):
@@ -141,7 +141,7 @@ def StateUpdater():
 
 	if last_board_vin != board_vin:
 		app.setLabel("l_Vin", "Vin="+board_vin)
-	
+
 	if board_state != "OK":
 		if board_state != last_board_state:
 			last_board_state = board_state
@@ -152,8 +152,8 @@ def StateUpdater():
 		if board_state != last_board_state:
 			last_board_state = board_state
 			app.setLabel("l_BoardStatus", "Board " + board_state)
-			app.setBg("#202020")
-	
+			app.setBg("#00262B")
+
 
 	for name in roofstate:
 		if roofstate[name] != last_roofstate[name]:
@@ -177,10 +177,10 @@ def StateUpdater():
 
 # handle button events
 def press(button):
-	
+
 	if button == "abort":
 		writeFifo("move", "ABORT")
-	
+
 	if button == "open":
 		writeFifo("move", "OPEN")
 
@@ -190,10 +190,10 @@ def press(button):
 
 
 # create GUI
-app = gui("Roof", "240x600", handleArgs=False)
-app.setBg("#202020")
+app = gui("Roof", "200x200", handleArgs=False)
+app.setBg("#00262B")
 app.setFg("red")
-app.setFont(20)
+app.setFont(14)
 
 
 app.addImage("state_img", "ressources/Idle.png", 1, 0)
@@ -204,12 +204,13 @@ app.addLabel("opened", "-", 3, 0)
 app.addLabel("closed", "-", 3, 1)
 app.addButton("open", press, 5, 0)
 app.addButton("close", press, 5, 1)
-app.addButton("abort", press)
+app.addButton("abort", press, 6, 0)
 
 
-app.addLabel("l_BoardStatus")
-app.addLabel("l_Vin")
-app.getLabelWidget("l_Vin").config(font="Courier 14")
+app.addLabel("l_BoardStatus", "", 7, 0)
+app.getLabelWidget("l_BoardStatus").config(font="Courier 12")
+app.addLabel("l_Vin", "", 7, 1)
+app.getLabelWidget("l_Vin").config(font="Courier 12")
 
 
 
