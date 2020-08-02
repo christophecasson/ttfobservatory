@@ -48,6 +48,9 @@ done
 echo " [ RUNNING ]"
 
 
+echo "Warm CCD (Set temp to +30C)"
+indi_setprop -p $INDI_PORT "ZWO CCD ASI1600MM Pro.CCD_TEMPERATURE.CCD_TEMPERATURE_VALUE=30"
+
 
 echo -n "Loading indi EQMod Mount parameters..."
 indi_setprop -p $INDI_PORT "EQMod Mount.CONFIG_PROCESS.CONFIG_LOAD=On"

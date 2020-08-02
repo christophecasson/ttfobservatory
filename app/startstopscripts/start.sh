@@ -484,7 +484,7 @@ if [ $openRoof == true ]
         done
         echo " [ OK ]"
 
-	echo -n "Opening Telescope Cap..."
+	    echo -n "Opening Telescope Cap..."
         indi_setprop -p $INDI_PORT "Flip Flat.FLAT_LIGHT_CONTROL.FLAT_LIGHT_OFF=On"
 
         indi_setprop -p $INDI_PORT "Flip Flat.CAP_PARK.UNPARK=On"
@@ -509,6 +509,10 @@ if [ $openRoof == true ]
 	echo " [ OK ]"
     fi
 fi
+
+
+echo "Set CCD Cooler temperature to -20C"
+indi_setprop -p $INDI_PORT "ZWO CCD ASI1600MM Pro.CCD_TEMPERATURE.CCD_TEMPERATURE_VALUE=-20"
 
 
 
