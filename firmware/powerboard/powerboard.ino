@@ -44,13 +44,13 @@ bool state_out[6];
 
 String inputString = "";         // a String to hold incoming data
 bool stringComplete = false;  // whether the string is complete
-bool guiconnected = false;    // handle automatic status sending for GUI 
+bool guiconnected = false;    // handle automatic status sending for GUI
 
 bool board_status = false;
 
 void setup() {
   pinMode(pin_statusled, OUTPUT);
-  
+
   pinMode(pin_button_1, INPUT);
   pinMode(pin_button_2, INPUT);
   pinMode(pin_button_3, INPUT);
@@ -81,7 +81,7 @@ void setup() {
   state_out[3] = false;
   state_out[4] = false;
   state_out[5] = false;
-  
+
   for(int i=0; i<4; i++)
   {
     key[i]->begin();
@@ -92,7 +92,7 @@ void setup() {
   }
 
   Serial.begin(9600);
-  
+
   // reserve 200 bytes for the inputString:
   inputString.reserve(200);
 
@@ -103,9 +103,9 @@ void setup() {
 
 void loop() {
   ledblink();
-  
+
   inputvoltage = analogRead(pin_inputvoltage) * INV_COEF;
-  if(inputvoltage < 10000)
+  if(inputvoltage < 8000)
   {
     state_out[0] = false;
     state_out[1] = false;
@@ -206,7 +206,7 @@ void loop() {
     {
       printVoltageStatus();
     }
-    
+
     else if(inputString == "ALL ON\r")
     {
       for(int i=0;i<6;i++)
@@ -231,7 +231,7 @@ void loop() {
     {
       Serial.print("[OK] STATE ");
       for(int i=0;i<6;i++)
-      {   
+      {
         Serial.print(i+1);
         Serial.print(":");
         state_out[i] ? Serial.print("ON") : Serial.print("OFF");
@@ -360,11 +360,11 @@ void loop() {
       Serial.println("[ERROR] UNKNOWN COMMAND!");
       PrintHelp();
     }
-    
-     
 
 
-    
+
+
+
     // clear the string:
     inputString = "";
     stringComplete = false;
@@ -402,7 +402,7 @@ void serialEvent()
     char inChar = (char)Serial.read();
     // add it to the inputString:
     inputString += inChar;
-   
+
     if(inputString == "@")
     {
       guiconnected = true;
@@ -477,7 +477,7 @@ void statussend()
 
 void printVoltageStatus()
 {
-  if(inputvoltage < 10000)
+  if(inputvoltage < 8000)
       {
         Serial.print("[ERROR] IN Voltage too low (");
       }
@@ -488,10 +488,8 @@ void printVoltageStatus()
       else
       {
         Serial.print("[OK] IN Voltage OK (");
-      } 
+      }
       Serial.print(inputvoltage);
       Serial.println(" mV)");
       Serial.print("#");
 }
-
-
