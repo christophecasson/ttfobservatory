@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 import os
 import errno
@@ -115,12 +115,12 @@ def connect():
 	while True:
 		try:
 			sys.stdout.write(".")
-   			sys.stdout.flush()
+			sys.stdout.flush()
 
 			ser = serial.Serial( port=serialport, baudrate=serialportbaudrate, timeout=5 )
 			ser.isOpen()
-			
-			print ""
+
+			print("")
 			debug("serial port " + serialport + " connected at " + str(serialportbaudrate) + " bauds")
 			serialWrite("@") #start automatic status sending on arduino
 			return
@@ -165,7 +165,7 @@ def serialRead(len):
 
 def serialWrite(data):
 	try:
-		ser.write(data)
+		ser.write(data.encode())
 		return
 	except serial.SerialException:
 		debug("Error sending " + str(data) )

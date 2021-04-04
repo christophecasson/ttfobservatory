@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 
 from appJar import gui
 from threading import Thread
@@ -73,13 +73,13 @@ def readFifo(i):
 	try:
 		pipe = os.open(fifo_path , os.O_RDONLY )#| os.O_NONBLOCK)
 		data = os.read(pipe, 4096)
-    		os.close(pipe)
+		os.close(pipe)
 	except OSError as err:
-        	if err.errno == 11:
+		if err.errno == 11:
 			return
-        	else:
-            		raise err
-   	if data!= '':
+		else:
+			raise err
+	if data!= '':
 		item = data.split()
 		lastitem = item[len(item)-1]
 		return lastitem

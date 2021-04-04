@@ -13,7 +13,7 @@ fifo_root_path  = "/home/astro/fifo/"
 
 #handle debug log
 def debug(text):
-	print "[ " + os.path.basename(sys.argv[0]) + " - " + str(datetime.now()) + " ] \t" + text
+	print("[ " + os.path.basename(sys.argv[0]) + " - " + str(datetime.now()) + " ] \t" + text)
 
 
 
